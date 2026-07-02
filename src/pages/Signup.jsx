@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/axios.jsx";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -92,7 +92,7 @@ export default function Signup() {
 
       console.log("📤 Sending payload:", payload);
 
-      const response = await axios.post("http://localhost:5000/user/register", payload);
+      const response = await api.post("/user/register", payload);
 
       console.log("✅ Response:", response.data);
 

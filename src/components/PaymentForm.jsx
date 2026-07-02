@@ -15,7 +15,7 @@ export default function PaymentForm() {
 
     try {
       // 1. Initiate cashin
-      const res = await fetch("http://localhost:5000/api/payment/cashin", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/cashin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: Number(amount), phone }),
@@ -34,7 +34,7 @@ export default function PaymentForm() {
         attempts++;
 
         const statusRes = await fetch(
-          `http://localhost:5000/api/payment/status/${data.ref}`
+          `${import.meta.env.VITE_API_URL}/api/payment/status/${data.ref}`
         );
         const statusData = await statusRes.json();
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios.jsx";
 
 const Ulogin = ({ onLogin }) => {
   const [email,         setEmail]         = useState("");
@@ -31,7 +31,7 @@ const Ulogin = ({ onLogin }) => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:5000/user/login", {
+      const response = await api.post("/user/login", {
         email,
         password,
         role,
@@ -335,8 +335,8 @@ const Ulogin = ({ onLogin }) => {
                         onClick={() => {
                           const appState = localStorage.getItem("redirectAfterLogin") || "";
                           const url = appState
-                            ? `http://localhost:5000/user/auth/google?appState=${encodeURIComponent(appState)}`
-                            : "http://localhost:5000/user/auth/google";
+                            ? `${import.meta.env.VITE_API_URL}/user/auth/google?appState=${encodeURIComponent(appState)}`
+                            : `${import.meta.env.VITE_API_URL}/user/auth/google`;
                           window.location.href = url;
                         }}
                         type="button"

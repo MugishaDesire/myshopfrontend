@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/axios.jsx";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -22,8 +22,8 @@ export default function ResetPassword() {
   useEffect(() => {
     if (!token) { setTokenValid(false); return; }
 
-    axios
-      .get(`http://localhost:5000/user/verify-reset-token/${token}`)
+    api
+      .get(`/user/verify-reset-token/${token}`)
       .then(() => setTokenValid(true))
       .catch(() => setTokenValid(false));
   }, [token]);
@@ -58,7 +58,7 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/user/reset-password", { token, newPassword });
+      await api.post("/user/reset-password", { token, newPassword });
       setSuccess(true);
       setTimeout(() => navigate("/ulogin"), 3000);
     } catch (err) {

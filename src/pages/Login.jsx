@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios.jsx";
 
 export default function LoginForm({ onLogin }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -55,7 +55,7 @@ export default function LoginForm({ onLogin }) {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:5000/admin/login", {
+      const response = await api.post("/admin/login", {
         email: formData.email,
         password: formData.password,
       });

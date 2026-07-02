@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "axios"; // only for Nominatim (external API)
+import api from "../api/axios.jsx"; // for all backend calls
 import { io } from "socket.io-client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -75,7 +76,6 @@ function LiveMap({ courierPos, customerLoc, activeOrder, initialCenter }) {
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    // ✅ Open map at courier's position — never a blank/wrong location
     const center = courierPos || initialCenter || customerLoc || [-1.9441, 30.0619];
 
     const map = L.map(containerRef.current, { center, zoom: 15, zoomControl: true });
@@ -151,6 +151,8 @@ function LiveMap({ courierPos, customerLoc, activeOrder, initialCenter }) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// BASE is kept only for socket.io — api handles all HTTP calls
+// ─────────────────────────────────────────────────────────────
 const BASE             = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5000`;
 const PUSH_INTERVAL_MS = 5000;
 
@@ -176,7 +178,6 @@ export default function CourierDashboard({ onLogout }) {
   const [courierPos,    setCourierPos]    = useState(null);
   const [customerLoc,   setCustomerLoc]   = useState(null);
 
-  // ✅ Seed map starting point from login-time GPS in localStorage
   const [initialCenter, setInitialCenter] = useState(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -211,7 +212,6 @@ export default function CourierDashboard({ onLogout }) {
     else         { setSuccess(msg); setTimeout(() => setSuccess(""), 5000); }
   }, []);
 
-  // Helper: read login GPS from localStorage
   const getLoginGPS = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -223,8 +223,7 @@ export default function CourierDashboard({ onLogout }) {
 
   // ─────────────────────────────────────────────────────────
   // updateLoginLocation — fires once on mount
-  // Sends current GPS → PATCH /user/courier/login-location
-  // Stores result in localStorage + sets initialCenter
+  // Uses api (not axios) for backend call
   // ─────────────────────────────────────────────────────────
   const updateLoginLocation = useCallback(async () => {
     if (!courier?.id || !navigator.geolocation) return;
@@ -233,19 +232,18 @@ export default function CourierDashboard({ onLogout }) {
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude, longitude } }) => {
         try {
-          await axios.patch(`${BASE}/user/courier/login-location`, {
+          // ✅ Fixed: use api instead of axios + BASE
+          await api.patch("/user/courier/login-location", {
             courierId: courier.id,
             latitude,
             longitude,
           });
 
-          // ✅ Persist so map start point survives refresh
           const stored = JSON.parse(localStorage.getItem("user") || "{}");
           stored.latitude  = latitude;
           stored.longitude = longitude;
           localStorage.setItem("user", JSON.stringify(stored));
 
-          // ✅ This becomes the map's starting point when delivery starts
           setInitialCenter([latitude, longitude]);
           setLoginLocStatus("updated");
           console.log(`✅ Login location (map start): ${latitude}, ${longitude}`);
@@ -269,7 +267,8 @@ export default function CourierDashboard({ onLogout }) {
     if (!courier?.id) { setLoadingOrders(false); return; }
     try {
       setLoadingOrders(true);
-      const res = await axios.get(`${BASE}/orders/courier/${courier.id}`);
+      // ✅ Fixed: use api instead of axios + BASE
+      const res = await api.get(`/orders/courier/${courier.id}`);
       setOrders((res.data || []).filter(o => o.status !== "Delivered"));
     } catch (err) {
       showMsg(err.response?.data?.message || "Failed to load orders.", true);
@@ -283,7 +282,7 @@ export default function CourierDashboard({ onLogout }) {
   // ── Socket ────────────────────────────────────────────────
   useEffect(() => {
     if (!courier?.id) return;
-    const socket = getSocket(BASE);
+    const socket = getSocket(BASE); // ✅ BASE kept for socket.io only
 
     const onConnect = () => {
       console.log("✅ Socket connected:", socket.id);
@@ -306,7 +305,6 @@ export default function CourierDashboard({ onLogout }) {
         setCustomerLoc(null);
         setDistance(null);
         setAutoDelivered(false);
-        // ✅ Restore login GPS as center after delivery completes
         const loginGPS = getLoginGPS();
         if (loginGPS) setInitialCenter(loginGPS);
       }, 5000);
@@ -330,7 +328,8 @@ export default function CourierDashboard({ onLogout }) {
   // ── Push location during delivery ─────────────────────────
   const pushLocation = useCallback(async (orderId, lat, lng) => {
     try {
-      const res = await axios.patch(`${BASE}/orders/${orderId}/location`, { lat, lng, label: "" });
+      // ✅ Fixed: use api instead of axios + BASE
+      const res = await api.patch(`/orders/${orderId}/location`, { lat, lng, label: "" });
       if (res.data?.distance !== undefined) setDistance(res.data.distance);
       const socket = getSocket(BASE);
       if (socket.connected)
@@ -354,13 +353,10 @@ export default function CourierDashboard({ onLogout }) {
   }, []);
 
   // ─────────────────────────────────────────────────────────
-  // ✅ resolveCustomerLocation
-  // Priority 1: order.delivery_lat / delivery_lng (real GPS coords)
-  // Priority 2: Geocode order.location text via Nominatim
-  // Priority 3: Kigali city centre fallback
+  // resolveCustomerLocation
+  // Uses plain axios for Nominatim (external API — not your backend)
   // ─────────────────────────────────────────────────────────
   const resolveCustomerLocation = useCallback(async (order) => {
-    // ── Real coords already on the order ─────────────────
     if (order.delivery_lat && order.delivery_lng) {
       const lat = parseFloat(order.delivery_lat);
       const lng = parseFloat(order.delivery_lng);
@@ -370,9 +366,9 @@ export default function CourierDashboard({ onLogout }) {
       }
     }
 
-    // ── Geocode the text address ──────────────────────────
     if (order.location) {
       try {
+        // ✅ axios kept here — this calls Nominatim (external), not your backend
         const res = await axios.get("https://nominatim.openstreetmap.org/search", {
           params: { q: order.location, format: "json", limit: 1 },
           headers: { "Accept-Language": "en" },
@@ -392,20 +388,7 @@ export default function CourierDashboard({ onLogout }) {
     return [-1.9441, 30.0619];
   }, []);
 
-  // ─────────────────────────────────────────────────────────
-  // ✅ startDelivery
-  //
-  // Timeline:
-  // 1. Immediately set initialCenter = login-time GPS
-  //    → map opens at courier's known position instantly
-  // 2. Resolve customer destination in parallel (non-blocking)
-  //    → customer marker appears as soon as geocoding finishes
-  // 3. Get fresh live GPS fix
-  //    → replaces initialCenter with exact current position
-  //    → courier marker placed, route line drawn
-  // 4. Open map view
-  // 5. Start watchPosition + push interval
-  // ─────────────────────────────────────────────────────────
+  // ── startDelivery ─────────────────────────────────────────
   const startDelivery = async (order) => {
     if (!navigator.geolocation) {
       showMsg("Geolocation is not supported by your device.", true);
@@ -421,30 +404,25 @@ export default function CourierDashboard({ onLogout }) {
     setCourierPos(null);
     setCustomerLoc(null);
 
-    // ✅ Step 1: Set login GPS as starting center immediately
-    // Map will open here even before live GPS resolves
     const loginGPS = getLoginGPS();
     setInitialCenter(loginGPS);
 
-    // ── Notify customer via socket ────────────────────────
     const socket = getSocket(BASE);
     if (socket.connected) {
       socket.emit("courier:started_delivery", { courierId: courier.id, orderId: order.id });
     }
 
-    // ✅ Step 2: Resolve customer destination (non-blocking)
     resolveCustomerLocation(order).then(coords => {
       console.log(`🎯 Customer pin placed at: ${coords}`);
       setCustomerLoc(coords);
     });
 
-    // ✅ Step 3: Get precise live GPS fix
     await new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         ({ coords: { latitude: lat, longitude: lng } }) => {
           const pos = [lat, lng];
           setCourierPos(pos);
-          setInitialCenter(pos); // override with exact live fix
+          setInitialCenter(pos);
           latestPosRef.current = { lat, lng };
           pushLocation(order.id, lat, lng);
           setGpsLoading(false);
@@ -453,7 +431,6 @@ export default function CourierDashboard({ onLogout }) {
         },
         (err) => {
           console.error("GPS error:", err.code, err.message);
-          // ✅ Map still opens at login GPS — graceful degradation
           if (err.code === 1) showMsg("Location permission denied. Map opens at your last known position.", true);
           else                showMsg("GPS signal weak. Map opens at your login position.", true);
           setGpsLoading(false);
@@ -463,10 +440,8 @@ export default function CourierDashboard({ onLogout }) {
       );
     });
 
-    // ✅ Step 4: Open map — always has a starting point
     setView("map");
 
-    // ✅ Step 5: Continuous GPS watch
     watchIdRef.current = navigator.geolocation.watchPosition(
       ({ coords: { latitude: lat, longitude: lng } }) => {
         latestPosRef.current = { lat, lng };
@@ -479,7 +454,6 @@ export default function CourierDashboard({ onLogout }) {
       { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
     );
 
-    // ✅ Step 5b: Server push every 5s (geofence auto-delivery)
     pushTimerRef.current = setInterval(() => {
       const currentOrder     = activeOrderRef.current;
       const { lat, lng }     = latestPosRef.current;
@@ -497,7 +471,6 @@ export default function CourierDashboard({ onLogout }) {
     setCustomerLoc(null);
     setDistance(null);
     setAutoDelivered(false);
-    // ✅ Restore login GPS as center
     const loginGPS = getLoginGPS();
     if (loginGPS) setInitialCenter(loginGPS);
   };
@@ -654,7 +627,6 @@ export default function CourierDashboard({ onLogout }) {
                         <div>
                           <span className="cd-address-label">Delivery address</span>
                           <span className="cd-address-value">{order.location || "No address"}</span>
-                          {/* ✅ Badge when real GPS coords are already on the order */}
                           {order.delivery_lat && order.delivery_lng && (
                             <span className="cd-address-coords">🛰️ GPS coordinates available</span>
                           )}
@@ -719,7 +691,6 @@ export default function CourierDashboard({ onLogout }) {
               </div>
             )}
 
-            {/* ✅ GPS bar shows which position source is active */}
             <div className={`cd-gps-bar ${courierPos ? "cd-gps-active" : "cd-gps-searching"}`}>
               {courierPos
                 ? `📡 Live GPS — ${courierPos[0].toFixed(5)}, ${courierPos[1].toFixed(5)} · Auto-delivers within 100 m`

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 export default function ProductCard() {
   const [products, setProducts] = useState([]);
@@ -8,7 +8,7 @@ export default function ProductCard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/products")
+    api.get("/products")
       .then(res => {
         console.log("Full API Response:", res);
         console.log("Response data:", res.data);
@@ -79,7 +79,7 @@ export default function ProductCard() {
     }
     
     // Construct full URL
-    const fullUrl = `http://localhost:5000/uploads/${cleanPath}`;
+    const fullUrl = `${import.meta.env.VITE_API_URL}/uploads/${cleanPath}`;
     console.log(`Constructed URL for ${product.name}:`, fullUrl);
     
     return fullUrl;

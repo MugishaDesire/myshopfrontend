@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ export default function Profile() {
     try {
       // Endpoint: PUT http://localhost:5000/user/:id
       // Swap this URL to match your actual backend route
-      const res = await axios.put(`http://localhost:5000/user/${user.id}`, {
+      const res = await api.put(`/user/${user.id}`, {
         fullname: personalForm.fullname,
         email: personalForm.email,
         phonenumber: personalForm.phonenumber,
@@ -136,7 +136,7 @@ export default function Profile() {
     try {
       // Endpoint: PUT http://localhost:5000/user/password/:id
       // Swap this URL to match your actual backend route
-      await axios.put(`http://localhost:5000/user/password/${user.id}`, {
+      await api.put(`/user/password/${user.id}`, {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
       });

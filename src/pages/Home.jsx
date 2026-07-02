@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { getWishlist, saveWishlist, toggleWishlist } from "./Wishlist";
+import api from "../api/axios.jsx";
 
 const CATEGORIES = ["All", "Electronics", "Fashion", "Food", "Art", "Beauty"];
 
@@ -52,7 +52,7 @@ export default function Home() {
   }, [cart]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/products")
+    api.get("/products")
       .then(res => { setProducts(res.data); setLoading(false); })
       .catch(err => { setError("Failed to load products. Please try again later."); setLoading(false); });
   }, []);
@@ -330,7 +330,7 @@ export default function Home() {
                       <div key={p.id} className="product-card">
                         <div className="product-img-wrap" onClick={() => openProductModal(p)}>
                           <img
-                            src={p.image ? `http://localhost:5000/uploads/${p.image}` : "https://placehold.co/300x200/3b82f6/white?text=No+Image"}
+                            src={p.image ? `${import.meta.env.VITE_API_URL}/uploads/${p.image}` : "https://placehold.co/300x200/3b82f6/white?text=No+Image"}
                             alt={p.name || "Product"}
                             className="product-img"
                             onError={e => { e.target.src = "https://placehold.co/300x200/3b82f6/white?text=No+Image"; e.target.onerror = null; }}
@@ -420,7 +420,7 @@ export default function Home() {
                   onClick={() => setImageZoom(!imageZoom)}
                 >
                   <img
-                    src={selectedProduct.image ? `http://localhost:5000/uploads/${selectedProduct.image}` : "https://placehold.co/600x500/3b82f6/white?text=No+Image"}
+                    src={selectedProduct.image ? `${import.meta.env.VITE_API_URL}/uploads/${selectedProduct.image}` : "https://placehold.co/600x500/3b82f6/white?text=No+Image"}
                     alt={selectedProduct.name}
                     className="modal-img"
                     onError={e => { e.target.src = "https://placehold.co/600x500/3b82f6/white?text=No+Image"; e.target.onerror = null; }}

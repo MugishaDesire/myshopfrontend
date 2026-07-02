@@ -233,7 +233,7 @@ export default function Wishlist() {
                       <img
                         src={
                           item.image
-                            ? `http://localhost:5000/uploads/${item.image}`
+                            ? `${import.meta.env.VITE_API_URL}/uploads/${item.image}`
                             : "https://placehold.co/300x220/f1f5f9/94a3b8?text=No+Image"
                         }
                         alt={item.name}

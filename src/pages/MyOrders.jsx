@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios.jsx";
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -29,8 +29,8 @@ export default function MyOrders() {
     const fetchData = async () => {
       try {
         const [productsRes, ordersRes] = await Promise.all([
-          axios.get("http://localhost:5000/products"),
-          axios.get("http://localhost:5000/orders"),
+          api.get("/products"),
+          api.get("/orders"),
         ]);
 
         setProducts(productsRes.data);

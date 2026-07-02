@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import { io } from "socket.io-client";
 
 const CATEGORIES = ["Electronics", "Fashion", "Food", "Art", "Beauty"];
@@ -79,7 +79,7 @@ export default function AdminDashboard({ onLogout }) {
     setCashoutError("");
     setCashoutStatus("loading");
     try {
-      const res = await axios.post(`${BASE}/api/payment/cashout`, {
+      const res = await api.post(`/api/payment/cashout`, {
         amount: Math.round(Number(amount)), phone,
       });
       const { ref } = res.data;
@@ -88,7 +88,7 @@ export default function AdminDashboard({ onLogout }) {
       const interval = setInterval(async () => {
         attempts++;
         try {
-          const statusRes = await axios.get(`${BASE}/api/payment/status/${ref}`);
+          const statusRes = await api.get(`/api/payment/status/${ref}`);
           if (statusRes.data.status === "successful") { clearInterval(interval); setCashoutStatus("successful"); }
           else if (statusRes.data.status === "failed") { clearInterval(interval); setCashoutStatus("failed"); setCashoutError("Transfer was rejected. Please try again."); }
           else if (attempts >= 20) { clearInterval(interval); setCashoutStatus("failed"); setCashoutError("Transfer timed out. Check your Paypack dashboard."); }
@@ -189,7 +189,7 @@ export default function AdminDashboard({ onLogout }) {
   const fetchCouriers = async () => {
     try {
       setCourierLoading(true);
-      const res = await axios.get(`${BASE}/user/couriers`);
+      const res = await api.get(`/user/couriers`);
       setCouriers(Array.isArray(res.data.couriers) ? res.data.couriers : []);
     } catch (err) {
       console.error("Failed to load couriers", err);
@@ -206,8 +206,8 @@ export default function AdminDashboard({ onLogout }) {
       try {
         setLoading({ products: true, orders: true });
         const [productsRes, ordersRes] = await Promise.all([
-          axios.get(`${BASE}/products`),
-          axios.get(`${BASE}/orders`),
+          api.get(`/products`),
+          api.get(`/orders`),
         ]);
         setProducts(productsRes.data);
         setOrders(ordersRes.data);
@@ -235,7 +235,7 @@ export default function AdminDashboard({ onLogout }) {
       formData.append("stock",       Number(newItem.stock));
       formData.append("category",    newItem.category);
       if (newItem.imageFile) formData.append("image", newItem.imageFile);
-      const res = await axios.post(`${BASE}/products`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+      const res = await api.post(`/products`, formData, { headers: { "Content-Type": "multipart/form-data" } });
       setProducts([...products, {
         id:          res.data.productId,
         name:        newItem.name,
@@ -253,7 +253,7 @@ export default function AdminDashboard({ onLogout }) {
   const deleteProduct = (id, name) => {
     if (!id) return showMessage("Invalid product ID", true);
     if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
-    axios.delete(`${BASE}/products/${id}`)
+    api.delete(`/products/${id}`)
       .then(() => { setProducts(products.filter(p => p.id !== id)); showMessage("Product deleted successfully!"); })
       .catch(err => { console.error(err); showMessage("Failed to delete product", true); });
   };
@@ -281,7 +281,7 @@ export default function AdminDashboard({ onLogout }) {
     formData.append("description", editItem.description);
     formData.append("category",    editItem.category);
     if (editItem.imageFile) formData.append("image", editItem.imageFile);
-    axios.put(`${BASE}/products/${editId}`, formData, { headers: { "Content-Type": "multipart/form-data" } })
+    api.put(`/products/${editId}`, formData, { headers: { "Content-Type": "multipart/form-data" } })
       .then(() => {
         setProducts(products.map(p => p.id === editId
           ? { ...p, name: editItem.name, price: editItem.price, stock: editItem.stock, description: editItem.description, category: editItem.category }
@@ -300,7 +300,7 @@ export default function AdminDashboard({ onLogout }) {
     if (!window.confirm(`Update status for ${customerName}'s order (${itemCount} item${itemCount > 1 ? "s" : ""})?`)) return;
     try {
       const responses = await Promise.all(
-        orderGroup.orderIds.map(orderId => axios.patch(`${BASE}/orders/${orderId}/status`))
+        orderGroup.orderIds.map(orderId => api.patch(`/orders/${orderId}/status`))
       );
       const newStatus = responses[0].data.status;
       setOrders(orders.map(o => orderGroup.orderIds.includes(o.id) ? { ...o, status: newStatus } : o));
@@ -327,7 +327,7 @@ export default function AdminDashboard({ onLogout }) {
 
     setCreatingCourier(true);
     try {
-      await axios.post(`${BASE}/user/courier`, {
+      await api.post(`/user/courier`, {
         fullname:    name,
         email,
         phonenumber: phone,
@@ -347,7 +347,7 @@ export default function AdminDashboard({ onLogout }) {
   const deleteCourier = async (id, name) => {
     if (!window.confirm(`Remove courier "${name}"?\nTheir undelivered orders will be unassigned.`)) return;
     try {
-      await axios.delete(`${BASE}/user/courier/${id}`);
+      await api.delete(`/user/courier/${id}`);
       setCouriers(couriers.filter(c => c.id !== id));
       setOrders(orders.map(o => o.courier_id === id ? { ...o, courier_id: null, status: "Paid" } : o));
       showMessage("Courier removed successfully!");
@@ -371,7 +371,7 @@ export default function AdminDashboard({ onLogout }) {
     try {
       await Promise.all(
         assignModal.orderIds.map(id =>
-          axios.patch(`${BASE}/orders/${id}/assign`, {
+          api.patch(`/orders/${id}/assign`, {
             courier_id: Number(assignCourier),
           })
         )
@@ -429,7 +429,7 @@ export default function AdminDashboard({ onLogout }) {
     try {
       await Promise.all(
         orderGroup.orderIds.map(id =>
-          axios.patch(`${BASE}/orders/${id}/status`, { status: "Delivered" })
+          api.patch(`/orders/${id}/status`, { status: "Delivered" })
         )
       );
       setOrders(prev =>

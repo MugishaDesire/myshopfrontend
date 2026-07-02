@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/axios.jsx";
+import api from "../api/axios.jsx";
 
 export default function VerifyOtp({ onLogin }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -75,7 +76,7 @@ export default function VerifyOtp({ onLogin }) {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post("http://localhost:5000/admin/verify-otp", {
+      const res = await api.post("/admin/verify-otp", {
         adminId,
         otp: otpString,
       });
@@ -99,7 +100,7 @@ export default function VerifyOtp({ onLogin }) {
     if (!canResend) return;
     
     try {
-      await axios.post("http://localhost:5000/admin/resend-otp", { adminId });
+      await api.post("/admin/resend-otp", { adminId });
       setError("");
       setCanResend(false);
       setResendTimer(30);

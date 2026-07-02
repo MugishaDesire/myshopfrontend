@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../api/axios.jsx";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const CATEGORIES = ["All", "Electronics", "Fashion", "Food", "Art", "Beauty"];
@@ -135,7 +135,7 @@ useEffect(() => {
 
     const fetchData = async () => {
       try {
-        const [productsRes, ordersRes] = await Promise.all([axios.get("http://localhost:5000/products"), axios.get("http://localhost:5000/orders")]);
+        const [productsRes, ordersRes] = await Promise.all([api.get("/products"), api.get("/orders")]);
         setProducts(productsRes.data);
         const userPhone = parsedUser.phonenumber || parsedUser.phone || "";
         const userEmail = parsedUser.email || "";
@@ -520,7 +520,7 @@ useEffect(() => {
                             <div key={p.id} className="ud-product-card">
                               <div className="ud-product-img-wrap" onClick={() => openModal(p)}>
                                 <img
-                                  src={p.image ? `http://localhost:5000/uploads/${p.image}` : "https://placehold.co/300x200/3b82f6/white?text=No+Image"}
+                                  src={p.image ? `${import.meta.env.VITE_API_URL}/uploads/${p.image}` : "https://placehold.co/300x200/3b82f6/white?text=No+Image"}
                                   alt={p.name || "Product"}
                                   className="ud-product-img"
                                   onError={(e) => { e.target.src = "https://placehold.co/300x200/3b82f6/white?text=No+Image"; e.target.onerror = null; }}
@@ -719,7 +719,7 @@ useEffect(() => {
               <div>
                 <div className={`ud-modal-img-wrap ${imageZoom ? "zoomed" : ""}`} onClick={() => setImageZoom(!imageZoom)}>
                   <img
-                    src={selectedProduct.image ? `http://localhost:5000/uploads/${selectedProduct.image}` : "https://placehold.co/600x500/3b82f6/white?text=No+Image"}
+                    src={selectedProduct.image ? `${import.meta.env.VITE_API_URL}/uploads/${selectedProduct.image}` : "https://placehold.co/600x500/3b82f6/white?text=No+Image"}
                     alt={selectedProduct.name}
                     className="ud-modal-img"
                     onError={(e) => { e.target.src = "https://placehold.co/600x500/3b82f6/white?text=No+Image"; e.target.onerror = null; }}

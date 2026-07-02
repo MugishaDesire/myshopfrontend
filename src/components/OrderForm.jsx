@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import api from "../api/axios.jsx";
 
 export default function OrderForm() {
   const location   = useLocation();
@@ -91,8 +91,8 @@ export default function OrderForm() {
       if (location.state?.product) {
         setProduct(ensureNumberPrice(location.state.product));
       } else if (productId) {
-        axios
-          .get(`http://localhost:5000/products/${productId}`)
+        api
+          .get(`/products/${productId}`)
           .then((res) => setProduct(ensureNumberPrice(res.data)))
           .catch(() => navigateFallback());
       } else {
@@ -240,7 +240,7 @@ export default function OrderForm() {
           userId:      user?.id || null,
         };
 
-        await axios.post("http://localhost:5000/orders/batch", orderData, {
+        await api.post("/orders/batch", orderData, {
           headers: { "Content-Type": "application/json" },
         });
 
@@ -261,8 +261,8 @@ export default function OrderForm() {
           userId:      user?.id || null,
         };
 
-        await axios.post(
-          `http://localhost:5000/orders/${productId}`,
+        await api.post(
+          `/orders/${productId}`,
           newOrder,
           { headers: { "Content-Type": "application/json" } }
         );
@@ -289,8 +289,8 @@ export default function OrderForm() {
 
       // 1. Initiate Paypack cashin
       const amount = Math.round(totalPrice); // RWF — whole numbers only
-      const payRes = await axios.post(
-        "http://localhost:5000/api/payment/cashin",
+      const payRes = await api.post(
+        "/api/payment/cashin",
         { amount, phone: formData.telephone }
       );
 
@@ -304,8 +304,8 @@ export default function OrderForm() {
       const interval = setInterval(async () => {
         attempts++;
         try {
-          const statusRes = await axios.get(
-            `http://localhost:5000/api/payment/status/${ref}`
+          const statusRes = await api.get(
+            `/api/payment/status/${ref}`
           );
           const { status } = statusRes.data;
 
