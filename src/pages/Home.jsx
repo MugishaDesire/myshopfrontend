@@ -813,8 +813,16 @@ export default function Home() {
         .sidebar .filter-panel { background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid var(--border); position:sticky; top:130px; }
 
         /* ── MOBILE FILTER DRAWER ── */
+        /* FIX: this overlay is a mobile-only dimmer for the bottom-sheet drawer.
+           It previously had no breakpoint guard, so on desktop it rendered as
+           a full-viewport fixed layer (z-index:1998) sitting ABOVE the desktop
+           sidebar (which has no z-index of its own). Every click meant for a
+           category/price/sort control in the sidebar actually landed on this
+           overlay instead, whose only handler closes the panel — that's why
+           filtering appeared to work only on mobile. display:block is now
+           gated inside the same max-width:900px block as the drawer, so on
+           desktop this element is never visible or clickable. */
         .filter-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1998; }
-        .filter-overlay.open { display:block; animation:fadeIn 0.2s ease; }
         .filter-drawer { display:none; position:fixed; bottom:0; left:0; right:0; background:white; z-index:1999; border-radius:20px 20px 0 0; max-height:88vh; flex-direction:column; box-shadow:0 -8px 32px rgba(0,0,0,0.15); transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); }
         .filter-drawer.open { transform:translateY(0); }
         .fd-header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -995,6 +1003,7 @@ export default function Home() {
 
         @media (max-width:900px) {
           .sidebar { display:none !important; }
+          .filter-overlay.open { display:block; animation:fadeIn 0.2s ease; }
           .filter-drawer { display:flex; }
           .cat-pills-bar { display:flex; }
           .filter-toggle-label { display:none; }
