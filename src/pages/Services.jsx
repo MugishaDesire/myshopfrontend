@@ -7,7 +7,7 @@ const SERVICES = [
     tag: "Tech & Gadgets",
     color: "#3b82f6",
     bg: "#eff6ff",
-    desc: "From smartphones and laptops to smart home devices — we stock the latest tech at unbeatable prices with full warranty coverage.",
+    desc: "Discover cutting-edge technology—from flagship smartphones to smart home innovations. All backed by comprehensive warranties and expert support.",
     features: ["Official warranties", "Expert setup support", "Same-day dispatch", "Price match guarantee"],
   },
   {
@@ -16,7 +16,7 @@ const SERVICES = [
     tag: "Clothing & Style",
     color: "#ec4899",
     bg: "#fdf2f8",
-    desc: "Curated collections for every style and season. From everyday essentials to statement pieces, delivered fresh to your door.",
+    desc: "Express your style with our handpicked collections. From timeless essentials to bold statement pieces—fresh drops delivered weekly.",
     features: ["Free returns (30 days)", "Size guides & styling tips", "New drops weekly", "Authentic brands only"],
   },
   {
@@ -25,7 +25,7 @@ const SERVICES = [
     tag: "Fresh Delivery",
     color: "#10b981",
     bg: "#f0fdf4",
-    desc: "Quality groceries, artisan foods and specialty items sourced locally and internationally — delivered same day in Kigali.",
+    desc: "Premium groceries and artisanal foods sourced locally and globally. Same-day delivery powered by our cold-chain network.",
     features: ["Same-day delivery", "Fresh & cold-chain", "Local & imported", "Subscription bundles"],
   },
   {
@@ -34,7 +34,7 @@ const SERVICES = [
     tag: "Creative Living",
     color: "#f59e0b",
     bg: "#fffbeb",
-    desc: "Original artworks, prints, sculptures and home décor from Rwandan and African artists. Every piece tells a story.",
+    desc: "Authentic artworks and handcrafted decor from Rwanda's finest artists. Each piece carries a unique story and cultural heritage.",
     features: ["Artist-authenticated", "Gift wrapping", "Custom framing", "Corporate orders"],
   },
   {
@@ -43,7 +43,7 @@ const SERVICES = [
     tag: "Skincare & Wellness",
     color: "#a855f7",
     bg: "#faf5ff",
-    desc: "Premium skincare, makeup and wellness products. Clean beauty options, dermatologist-tested and suited for all skin types.",
+    desc: "Elevate your self-care ritual with premium skincare and wellness essentials. Clean, dermatologist-tested formulas for every skin type.",
     features: ["Clean ingredients", "All skin types", "Expert recommendations", "Loyalty rewards"],
   },
   {
@@ -52,16 +52,16 @@ const SERVICES = [
     tag: "Logistics",
     color: "#f97316",
     bg: "#fff7ed",
-    desc: "Reliable delivery across Kigali and beyond. Track your order in real time from checkout to your doorstep.",
+    desc: "Reliable delivery network spanning Kigali and beyond. Track every step of your journey from checkout to doorstep.",
     features: ["Real-time tracking", "Same-day in Kigali", "Nationwide shipping", "Secure packaging"],
   },
 ];
 
 const PROCESS = [
-  { step: "01", title: "Browse & Discover", desc: "Explore thousands of products across all categories with smart filters and search.", icon: "🔍" },
-  { step: "02", title: "Add to Cart", desc: "Build your order at your own pace — your cart is saved even if you leave.", icon: "🛒" },
-  { step: "03", title: "Secure Checkout", desc: "Fast, secure payment with multiple methods. Your data is always protected.", icon: "🔒" },
-  { step: "04", title: "Track & Receive", desc: "Real-time updates from dispatch to delivery. We keep you informed every step.", icon: "📦" },
+  { step: "01", title: "Explore", desc: "Browse thousands of products with intelligent filters and personalized recommendations.", icon: "🔍" },
+  { step: "02", title: "Select", desc: "Build your cart at your own pace—we'll save your selections even if you step away.", icon: "🛒" },
+  { step: "03", title: "Checkout", desc: "Complete your purchase with secure, frictionless payment. Your data stays protected.", icon: "🔒" },
+  { step: "04", title: "Receive", desc: "Track your order in real-time. We keep you updated from dispatch to delivery.", icon: "📦" },
 ];
 
 const STATS = [
@@ -106,7 +106,6 @@ export default function Services() {
           overflow-x: hidden;
         }
 
-        /* ── SCROLL ANIMATIONS ── */
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
@@ -128,7 +127,6 @@ export default function Services() {
         .sv-animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
         .sv-animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
 
-        /* ── HERO ── */
         .sv-hero {
           background: linear-gradient(135deg, #0a0f1e 0%, #1a2a4a 50%, #0f172a 100%);
           padding: 100px 24px 120px;
@@ -247,11 +245,9 @@ export default function Services() {
           border-color: rgba(255,255,255,0.3);
         }
 
-        /* ── WAVE ── */
         .sv-wave { display: block; line-height: 0; background: var(--brand); }
         .sv-wave svg { width: 100%; height: 64px; display: block; }
 
-        /* ── STATS BAR ── */
         .sv-stats {
           background: var(--brand);
           padding: 0 24px 56px;
@@ -314,7 +310,6 @@ export default function Services() {
           .sv-stats-inner { grid-template-columns: repeat(2, 1fr); border-radius: var(--radius-sm); }
         }
 
-        /* ── SECTION WRAPPER ── */
         .sv-section { padding: 80px 24px; }
         .sv-section-alt { background: var(--card); }
         .sv-section-inner { max-width: 1200px; margin: 0 auto; }
@@ -361,7 +356,6 @@ export default function Services() {
           margin-bottom: 52px;
         }
 
-        /* ── SERVICE CARDS ── */
         .sv-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -487,7 +481,6 @@ export default function Services() {
           transform: scale(1.1);
         }
 
-        /* ── PROCESS ── */
         .sv-process {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -571,7 +564,6 @@ export default function Services() {
           margin: 0 auto;
         }
 
-        /* ── WHY US BANNER ── */
         .sv-why {
           background: linear-gradient(135deg, #0a0f1e 0%, #1a2a4a 50%, #0f172a 100%);
           padding: 80px 24px;
@@ -691,7 +683,6 @@ export default function Services() {
           font-weight: 500;
         }
 
-        /* ── CTA STRIP ── */
         .sv-cta {
           background: linear-gradient(135deg, var(--accent), #ea580c);
           padding: 64px 24px;
@@ -772,7 +763,6 @@ export default function Services() {
 
       <div className="sv-page">
 
-        {/* ── HERO ── */}
         <section className="sv-hero">
           <div className="sv-hero-inner">
             <div className="sv-hero-badge sv-animate">✦ What We Offer</div>
@@ -785,14 +775,12 @@ export default function Services() {
           </div>
         </section>
 
-        {/* ── WAVE ── */}
         <div className="sv-wave" style={{ background: "#f8fafc" }}>
           <svg viewBox="0 0 1440 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,32 C360,64 1080,0 1440,32 L1440,64 L0,64 Z" fill="#0f172a" />
           </svg>
         </div>
 
-        {/* ── STATS ── */}
         <div className="sv-stats">
           <div className="sv-stats-inner">
             {STATS.map((s, i) => (
@@ -804,7 +792,6 @@ export default function Services() {
           </div>
         </div>
 
-        {/* ── SERVICES GRID ── */}
         <section className="sv-section">
           <div className="sv-section-inner">
             <div className="sv-section-label">✦ Our Services</div>
@@ -831,7 +818,6 @@ export default function Services() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ── */}
         <section className="sv-section sv-section-alt">
           <div className="sv-section-inner">
             <div className="sv-section-label">✦ How It Works</div>
@@ -853,7 +839,6 @@ export default function Services() {
           </div>
         </section>
 
-        {/* ── WHY CHOOSE US ── */}
         <section className="sv-why">
           <div className="sv-why-inner">
             <div className="sv-why-text">
@@ -894,7 +879,6 @@ export default function Services() {
           </div>
         </section>
 
-        {/* ── CTA ── */}
         <section className="sv-cta">
           <h2>Ready to Start Shopping?</h2>
           <p>Join thousands of happy customers across Rwanda. Your next favourite product is one click away.</p>
