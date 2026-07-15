@@ -8,6 +8,7 @@ const CATEGORIES   = ["All", "Electronics", "Fashion", "Food", "Art", "Beauty"];
 const CAT_ICONS    = { All:"🏷️", Electronics:"⚡", Fashion:"👗", Food:"🍽️", Art:"🎨", Beauty:"💄" };
 const PLACEHOLDER  = "https://placehold.co/300x200/3b82f6/white?text=No+Image";
 const PLACEHOLDER_LG = "https://placehold.co/600x500/3b82f6/white?text=No+Image";
+const DESKTOP_BREAKPOINT = "(min-width: 900px)"; // keep in sync with the CSS @media queries below
 
 // ── Normalise raw DB row ───────────────────────────────────────────────────────
 function normaliseProduct(raw) {
@@ -173,7 +174,14 @@ export default function Home() {
   const [imageZoom,        setImageZoom]        = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [priceRange,       setPriceRange]       = useState([0, 5000]);
-  const [sidebarOpen,      setSidebarOpen]      = useState(false);
+  // FIX: the sidebar is a permanent column on desktop and a slide-up drawer on
+  // mobile. It must default to OPEN on desktop (otherwise the desktop sidebar
+  // renders at width:0/overflow:hidden and the whole FilterPanel is clipped
+  // and unusable until the toggle button is clicked) and CLOSED on mobile
+  // (where it's an overlay drawer that should start hidden).
+  const [sidebarOpen,      setSidebarOpen]      = useState(
+    () => typeof window !== "undefined" && window.matchMedia(DESKTOP_BREAKPOINT).matches
+  );
   const [cartOpen,         setCartOpen]         = useState(false);
   const [lastAdded,        setLastAdded]        = useState(null);
   const navigate = useNavigate();
@@ -222,12 +230,18 @@ export default function Home() {
       });
   }, []);
 
-  // ── Close sidebar when viewport grows past 900 ─────────
+  // ── Keep sidebar state in sync with viewport ───────────
+  // FIX: previously this only listened for the breakpoint `change` event and
+  // always forced sidebarOpen(false) when the viewport was desktop-sized,
+  // which is backwards (it should stay OPEN on desktop). It also never ran
+  // once on mount, so the very first desktop render used the stale default.
+  // Now: crossing UP into desktop opens it, crossing DOWN into mobile closes
+  // it (so the mobile drawer doesn't appear stuck open after a resize).
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 900px)");
-    const h  = e => { if (e.matches) setSidebarOpen(false); };
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
+    const mq = window.matchMedia(DESKTOP_BREAKPOINT);
+    const handleChange = e => setSidebarOpen(e.matches);
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
   }, []);
 
   // ── Cart helpers ───────────────────────────────────────
@@ -825,9 +839,14 @@ export default function Home() {
         .price-val { background:var(--bg); border:1.5px solid var(--border); border-radius:7px; padding:4px 8px; font-size:0.85rem; font-weight:700; color:var(--text); flex:1; text-align:center; }
         .price-sep { color:var(--muted); font-size:0.8rem; }
         .range-wrap { position:relative; height:36px; margin-bottom:4px; }
-        .range-slider { position:absolute; width:100%; left:0; -webkit-appearance:none; appearance:none; height:4px; background:transparent; outline:none; pointer-events:none; top:14px; }
+        .range-slider { position:absolute; width:100%; left:0; -webkit-appearance:none; -moz-appearance:none; appearance:none; height:4px; background:transparent; outline:none; pointer-events:none; top:14px; }
         .range-slider::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--accent); border:3px solid white; box-shadow:0 2px 6px rgba(249,115,22,0.4); cursor:pointer; pointer-events:all; }
         .range-slider::-webkit-slider-runnable-track { height:4px; background:var(--border); border-radius:4px; }
+        /* FIX: Firefox ignores the WebKit-only thumb selector above, so the
+           slider's pointer-events:none on the input was never re-enabled and
+           the price slider couldn't be dragged at all in Firefox. */
+        .range-slider::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:var(--accent); border:3px solid white; box-shadow:0 2px 6px rgba(249,115,22,0.4); cursor:pointer; pointer-events:all; }
+        .range-slider::-moz-range-track { height:4px; background:var(--border); border-radius:4px; }
         .price-ticks { display:flex; justify-content:space-between; font-size:0.65rem; color:var(--muted); margin-top:2px; }
         .price-reset { width:100%; margin-top:8px; padding:7px; border-radius:7px; background:var(--bg); border:1.5px solid var(--border); font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600; color:var(--muted); cursor:pointer; transition:all 0.15s; }
         .price-reset:hover { border-color:var(--accent); color:var(--accent); background:#fff7ed; }

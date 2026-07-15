@@ -101,7 +101,7 @@ export default function Navbar() {
         <div className="top-bar">
           <div className="top-bar-inner">
 
-            {/* Hamburger — visible on mobile only */}
+            {/* Hamburger — visible on all screen sizes, opens the drawer */}
             <button
               className={`hamburger-top ${isMobileMenuOpen ? "open" : ""}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -246,28 +246,13 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ══════════════════════════════════════
-            BOTTOM NAV BAR  — desktop only
-        ══════════════════════════════════════ */}
-        <div className="bottom-bar">
-          <div className="bottom-bar-inner">
-            <nav className="bottom-nav-links">
-              {[
-                { to:"/",        label:"Home"    },
-                { to:"/about",   label:"About Us"},
-                { to:"/contact", label:"Contact" },
-                { to:"/services",label:"Services"},
-              ].map(({ to, label }) => (
-                <Link key={to} to={to} className={`bnav-link ${isActive(to) ? "active" : ""}`}>{label}</Link>
-              ))}
-            </nav>
-            <span className="promo-tag">🔥 Free shipping on orders over $50</span>
-          </div>
-        </div>
+        {/* Bottom bar removed — Home / About / Contact / Services now live
+            exclusively in the drawer (hamburger), which is available at
+            every screen size. This avoids duplicate navigation. */}
       </header>
 
       {/* ══════════════════════════════════════
-          MOBILE DRAWER
+          DRAWER (used at all screen sizes)
       ══════════════════════════════════════ */}
       {isMobileMenuOpen && (
         <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)} />
@@ -390,9 +375,9 @@ export default function Navbar() {
           display: flex; align-items: center; gap: 16px;
         }
 
-        /* ── Hamburger (top bar, mobile) ── */
+        /* ── Hamburger (top bar) — visible at every screen size ── */
         .hamburger-top {
-          display: none;
+          display: flex;
           flex-direction: column; justify-content: center;
           gap: 5px;
           background: rgba(249,115,22,0.12);
@@ -583,34 +568,6 @@ export default function Navbar() {
         }
         .account-status { font-size: 0.67rem; color: rgba(255,255,255,0.7); }
 
-        /* ── Bottom bar ── */
-        .bottom-bar { background: var(--brand2); border-top: 1px solid rgba(255,255,255,0.06); }
-        .bottom-bar-inner {
-          max-width: 1400px; margin: 0 auto;
-          padding: 0 20px; height: 44px;
-          display: flex; align-items: center;
-        }
-        .bottom-nav-links { display: flex; align-items: center; gap: 2px; flex: 1; }
-        .bnav-link {
-          color: rgba(255,255,255,0.75); text-decoration: none;
-          font-size: 0.9rem; font-weight: 500;
-          padding: 6px 15px; border-radius: 6px;
-          position: relative; transition: all 0.2s; white-space: nowrap;
-        }
-        .bnav-link:hover { color: white; background: rgba(255,255,255,0.08); }
-        .bnav-link.active { color: var(--accent); font-weight: 600; }
-        .bnav-link.active::after {
-          content:''; position: absolute;
-          bottom: -1px; left: 15px; right: 15px;
-          height: 2px; background: var(--accent); border-radius: 2px;
-        }
-        .promo-tag {
-          color: var(--gold); font-size: 0.8rem; font-weight: 500;
-          white-space: nowrap; margin-left: auto;
-          animation: pulse 2.5s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
-
         /* ── Overlay ── */
         .mobile-overlay {
           position: fixed; inset: 0;
@@ -684,20 +641,17 @@ export default function Navbar() {
            RESPONSIVE BREAKPOINTS
         ════════════════════════════════════════ */
 
-        /* Tablet — hide account text, promo tag */
+        /* Tablet — hide account text */
         @media (max-width: 1024px) {
           .account-info { display: none !important; }
           .account-btn  { padding: 7px; }
-          .promo-tag    { display: none; }
         }
 
         /* Large mobile / small tablet */
         @media (max-width: 768px) {
           .desktop-only { display: none !important; }
           .mobile-only  { display: flex !important; }
-          .hamburger-top { display: flex; }
           .action-label { display: none; }
-          .bottom-bar   { display: none; }   /* hide bottom nav on mobile — use drawer */
           .top-bar-inner { height: 56px; padding: 0 14px; gap: 10px; }
           .logo-text { font-size: 1.45rem; }
         }
