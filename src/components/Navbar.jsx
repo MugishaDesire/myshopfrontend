@@ -246,9 +246,22 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Bottom bar removed — Home / About / Contact / Services now live
-            exclusively in the drawer (hamburger), which is available at
-            every screen size. This avoids duplicate navigation. */}
+        {/* ══════════════════════════════════════
+            BOTTOM NAV BAR — desktop only.
+            On mobile, these same links live in the drawer instead,
+            so this bar is hidden there to avoid duplication.
+        ══════════════════════════════════════ */}
+        <div className="bottom-bar desktop-only">
+          <div className="bottom-bar-inner">
+            <nav className="bottom-nav-links">
+              <Link to="/" className={`bnav-link ${isActive("/") ? "active" : ""}`}>Home</Link>
+              <Link to="/about" className={`bnav-link ${isActive("/about") ? "active" : ""}`}>About Us</Link>
+              <Link to="/contact" className={`bnav-link ${isActive("/contact") ? "active" : ""}`}>Contact</Link>
+              <Link to="/services" className={`bnav-link ${isActive("/services") ? "active" : ""}`}>Services</Link>
+            </nav>
+            <span className="promo-tag">🔥 Free shipping on orders over $50</span>
+          </div>
+        </div>
       </header>
 
       {/* ══════════════════════════════════════
@@ -567,6 +580,34 @@ export default function Navbar() {
           overflow: hidden; text-overflow: ellipsis;
         }
         .account-status { font-size: 0.67rem; color: rgba(255,255,255,0.7); }
+
+        /* ── Bottom bar (desktop only) ── */
+        .bottom-bar { background: var(--brand2); border-top: 1px solid rgba(255,255,255,0.06); }
+        .bottom-bar-inner {
+          max-width: 1400px; margin: 0 auto;
+          padding: 0 20px; height: 44px;
+          display: flex; align-items: center; width: 100%;
+        }
+        .bottom-nav-links { display: flex; align-items: center; gap: 2px; flex: 1; }
+        .bnav-link {
+          color: rgba(255,255,255,0.75); text-decoration: none;
+          font-size: 0.9rem; font-weight: 500;
+          padding: 6px 15px; border-radius: 6px;
+          position: relative; transition: all 0.2s; white-space: nowrap;
+        }
+        .bnav-link:hover { color: white; background: rgba(255,255,255,0.08); }
+        .bnav-link.active { color: var(--accent); font-weight: 600; }
+        .bnav-link.active::after {
+          content:''; position: absolute;
+          bottom: -1px; left: 15px; right: 15px;
+          height: 2px; background: var(--accent); border-radius: 2px;
+        }
+        .promo-tag {
+          color: var(--gold); font-size: 0.8rem; font-weight: 500;
+          white-space: nowrap; margin-left: auto;
+          animation: pulse 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
 
         /* ── Overlay ── */
         .mobile-overlay {
