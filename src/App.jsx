@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import ProductCard from "./components/ProductCard";
+// import ProductCard from "./components/ProductCard";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -55,7 +55,7 @@ function AppLayout({
         {/* ── Public routes ──────────────────────────────── */}
         <Route path="/"               element={<Home />} />
         <Route path="/about"          element={<About />} />
-        <Route path="/products"       element={<ProductCard />} />
+        {/* <Route path="/products"       element={<ProductCard />} /> */}
         <Route path="/contact"        element={<Contact />} />
         <Route path="/services"       element={<Services />} />
         <Route path="/signup"         element={<Signup />} />

@@ -468,63 +468,65 @@ export default function Home() {
                     const isInCart   = !!cartItem;
                     const cartQty    = cartItem?.quantity || 0;
                     const wishlisted = wishlist.some(w => w.id === p.id);
-                    return (
-                      <div key={p.id} className="product-card">
-                        {/* Image */}
-                        <div className="product-img-wrap" onClick={() => openProductModal(p)}>
-                          <img
-                            src={p.imageUrl || PLACEHOLDER}
-                            alt={p.name || "Product"}
-                            className="product-img"
-                            onError={e => { e.target.src = PLACEHOLDER; e.target.onerror = null; }}
-                          />
-                          {p.stock <= 0
-                            ? <span className="badge oos">Out of Stock</span>
-                            : p.stock < 10
-                            ? <span className="badge low-s">Low Stock</span>
-                            : null}
-                          {isInCart && <span className="badge in-c">In Cart: {cartQty}</span>}
-                          <button
-                            className={`heart-btn ${wishlisted ? "hearted" : ""}`}
-                            onClick={e => { e.stopPropagation(); handleWishlistToggle(p); }}
-                          >
-                            {wishlisted ? "❤️" : "🤍"}
-                          </button>
-                          <div className="img-overlay">View Details</div>
-                        </div>
+                    // Uiverse "SachinKumar666" card, badge shows the most
+                    // relevant status (out of stock beats low stock beats in-cart)
+                    const badgeLabel = p.stock <= 0
+                      ? "Out of Stock"
+                      : p.stock < 10
+                      ? "Low Stock"
+                      : isInCart
+                      ? `In Cart · ${cartQty}`
+                      : null;
+                    const badgeClass = p.stock <= 0 ? "oos" : p.stock < 10 ? "low" : "cart";
 
-                        {/* Body */}
-                        <div className="product-body">
-                          <div className="product-top">
-                            <h3 className="product-name">{p.name || "Unnamed Product"}</h3>
-                            <span className="price-tag">${p.price.toFixed(2)}</span>
-                          </div>
-                          {p.description && (
-                            <p className="product-desc">
-                              {p.description.length > 90
-                                ? `${p.description.substring(0, 90)}…`
-                                : p.description}
-                            </p>
+                    return (
+                      <div key={p.id} className="card" onClick={() => openProductModal(p)}>
+                        <div className="card__shine"></div>
+                        <div className="card__glow"></div>
+
+                        <button
+                          className={`card__heart ${wishlisted ? "hearted" : ""}`}
+                          onClick={e => { e.stopPropagation(); handleWishlistToggle(p); }}
+                        >
+                          {wishlisted ? "❤️" : "🤍"}
+                        </button>
+
+                        <div className="card__content">
+                          {badgeLabel && (
+                            <div className={`card__badge ${badgeClass}`}>{badgeLabel}</div>
                           )}
-                          <div className="product-bottom">
-                            <span className={`stock-badge ${p.stock <= 0 ? "out" : p.stock < 10 ? "low" : "ok"}`}>
-                              {p.stock <= 0 ? "Out of stock" : `${p.stock} units`}
-                            </span>
-                            <div className="btn-row">
-                              <button
-                                className="btn-cart"
-                                onClick={() => addToCart(p)}
-                                disabled={p.stock <= 0}
-                              >
-                                {isInCart ? `➕ (${cartQty})` : "🛒 Add"}
-                              </button>
-                              <button
-                                className="btn-buy"
-                                onClick={() => handleBuyNow(p)}
-                                disabled={p.stock <= 0}
-                              >
-                                ⚡ Buy
-                              </button>
+
+                          <div
+                            className="card__image"
+                            style={{ backgroundImage: `url(${p.imageUrl || PLACEHOLDER})` }}
+                          />
+
+                          <div className="card__text">
+                            <p className="card__title">{p.name || "Unnamed Product"}</p>
+                            <p className="card__description">
+                              {p.description
+                                ? (p.description.length > 60
+                                    ? `${p.description.substring(0, 60)}…`
+                                    : p.description)
+                                : `${p.category || "General"} · ${p.stock <= 0 ? "Out of stock" : `${p.stock} in stock`}`}
+                            </p>
+                          </div>
+
+                          <div className="card__footer">
+                            <div className="card__price">${p.price.toFixed(2)}</div>
+                            <div
+                              className={`card__button ${p.stock <= 0 ? "disabled" : ""}`}
+                              onClick={e => { e.stopPropagation(); if (p.stock > 0) addToCart(p); }}
+                              title={p.stock <= 0 ? "Out of stock" : isInCart ? `Add another (${cartQty} in cart)` : "Add to cart"}
+                            >
+                              <svg height="16" width="16" viewBox="0 0 24 24">
+                                <path
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  d="M4 12H20M12 4V20"
+                                  fill="currentColor"
+                                ></path>
+                              </svg>
                             </div>
                           </div>
                         </div>
@@ -870,38 +872,164 @@ export default function Home() {
         .spinner { width:40px; height:40px; border:4px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.9s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* ── PRODUCT GRID ── */
-        .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
-        .product-card { background:var(--card); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; display:flex; flex-direction:column; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:all 0.25s ease; }
-        .product-card:hover { transform:translateY(-4px); box-shadow:0 12px 28px rgba(0,0,0,0.1); }
-        .product-img-wrap { position:relative; height:180px; overflow:hidden; cursor:pointer; background:#f8fafc; }
-        .product-img { width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease; }
-        .product-card:hover .product-img { transform:scale(1.05); }
-        .img-overlay { position:absolute; inset:0; background:rgba(15,23,42,0.45); color:white; font-weight:700; font-size:0.88rem; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.25s; }
-        .product-card:hover .img-overlay { opacity:1; }
-        .badge { position:absolute; padding:3px 9px; border-radius:20px; font-size:0.68rem; font-weight:700; text-transform:uppercase; }
-        .badge.oos  { top:8px; left:8px; background:var(--red); color:white; }
-        .badge.low-s { top:8px; left:8px; background:var(--gold); color:white; }
-        .badge.in-c  { top:8px; right:44px; background:var(--blue); color:white; }
-        .heart-btn { position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.92); border:none; border-radius:50%; width:30px; height:30px; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12); transition:all 0.2s; z-index:5; }
-        .heart-btn:hover { transform:scale(1.15); }
-        .product-body { padding:12px; flex:1; display:flex; flex-direction:column; gap:7px; }
-        .product-top { display:flex; justify-content:space-between; align-items:flex-start; gap:6px; }
-        .product-name { font-size:0.92rem; font-weight:700; color:var(--text); flex:1; line-height:1.3; }
-        .price-tag { background:linear-gradient(135deg,#10b981,#059669); color:white; padding:3px 9px; border-radius:20px; font-size:0.78rem; font-weight:700; white-space:nowrap; flex-shrink:0; }
-        .product-desc { color:var(--muted); font-size:0.8rem; line-height:1.5; flex:1; }
-        .product-bottom { margin-top:auto; display:flex; flex-direction:column; gap:8px; }
-        .stock-badge { font-size:0.72rem; font-weight:700; padding:2px 9px; border-radius:20px; align-self:flex-start; }
-        .stock-badge.ok  { background:#d1fae5; color:#065f46; }
-        .stock-badge.low { background:#fef3c7; color:#92400e; }
-        .stock-badge.out { background:#fee2e2; color:var(--red); }
-        .btn-row { display:flex; gap:6px; }
-        .btn-cart, .btn-buy { flex:1; padding:9px 6px; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:3px; min-height:40px; }
-        .btn-cart { background:linear-gradient(135deg,#10b981,#059669); color:white; flex:2; }
-        .btn-buy  { background:linear-gradient(135deg,#3b82f6,#2563eb); color:white; }
-        .btn-cart:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 4px 10px rgba(16,185,129,0.3); }
-        .btn-buy:hover:not(:disabled)  { transform:translateY(-1px); box-shadow:0 4px 10px rgba(59,130,246,0.3); }
-        .btn-cart:disabled, .btn-buy:disabled { background:#cbd5e1; cursor:not-allowed; }
+        /* ── PRODUCT GRID (Uiverse "SachinKumar666" card) ── */
+        .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:18px; margin-bottom:24px; }
+
+        .card {
+          --card-bg: #ffffff;
+          --card-accent: #f97316;
+          --card-text: #1e293b;
+          --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+          width: 100%;
+          background: var(--card-bg);
+          border-radius: 20px;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: var(--card-shadow);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          font-family: 'DM Sans', sans-serif;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+        }
+        .card__shine {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+        }
+        .card__glow {
+          position: absolute;
+          inset: -10px;
+          background: radial-gradient(circle at 50% 0%, rgba(249,115,22,0.25) 0%, rgba(249,115,22,0) 70%);
+          opacity: 0;
+          transition: opacity 0.5s ease;
+          pointer-events: none;
+        }
+        .card__heart {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          z-index: 6;
+          background: rgba(255,255,255,0.92);
+          border: none;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          font-size: 0.9rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+          transition: transform 0.2s ease;
+        }
+        .card__heart:hover { transform: scale(1.15); }
+        .card__content {
+          padding: 1.1em;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 0.7em;
+          position: relative;
+          z-index: 2;
+        }
+        .card__badge {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          color: white;
+          padding: 0.25em 0.6em;
+          border-radius: 999px;
+          font-size: 0.65em;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          z-index: 3;
+        }
+        .card__badge.oos  { background: var(--red); }
+        .card__badge.low  { background: var(--gold); }
+        .card__badge.cart { background: var(--blue); }
+        .card__image {
+          width: 100%;
+          height: 130px;
+          background-color: #ede9fe;
+          background-size: cover;
+          background-position: center;
+          border-radius: 12px;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+          overflow: hidden;
+        }
+        .card__text { display: flex; flex-direction: column; gap: 0.25em; }
+        .card__title {
+          color: var(--card-text);
+          font-size: 1em;
+          font-weight: 700;
+          transition: all 0.3s ease;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .card__description {
+          color: var(--card-text);
+          font-size: 0.75em;
+          opacity: 0.7;
+          transition: all 0.3s ease;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .card__footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: auto;
+        }
+        .card__price {
+          color: var(--card-text);
+          font-weight: 700;
+          font-size: 1em;
+          transition: all 0.3s ease;
+        }
+        .card__button {
+          width: 30px;
+          height: 30px;
+          background: var(--card-accent);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          flex-shrink: 0;
+        }
+        .card__button.disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        /* Hover effects */
+        .card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+          border-color: rgba(249,115,22,0.2);
+        }
+        .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
+        .card:hover .card__glow { opacity: 1; }
+        .card:hover .card__image { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card:hover .card__title { color: var(--card-accent); }
+        .card:hover .card__description { opacity: 1; }
+        .card:hover .card__price { color: var(--card-accent); }
+        .card:hover .card__button:not(.disabled) { transform: scale(1.1); box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
+        .card:hover .card__button:not(.disabled) svg { animation: pulse 1.5s infinite; }
+        .card:active { transform: translateY(-3px) scale(0.98); }
+
+        @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
         .empty-state { grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--card); border-radius:var(--radius); border:2px dashed var(--border); }
         .empty-icon { font-size:3rem; margin-bottom:10px; opacity:0.5; }
         .empty-state h3 { color:var(--text); margin-bottom:6px; }
@@ -1026,7 +1154,7 @@ export default function Home() {
         @media (max-width:420px) {
           .product-grid { grid-template-columns:1fr; }
           .body-wrap { padding:10px; }
-          .product-img-wrap { height:200px; }
+          .card__image { height:160px; }
         }
       `}</style>
     </>
