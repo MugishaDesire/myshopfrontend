@@ -496,10 +496,13 @@ export default function Home() {
                             <div className={`card__badge ${badgeClass}`}>{badgeLabel}</div>
                           )}
 
-                          <div
-                            className="card__image"
-                            style={{ backgroundImage: `url(${p.imageUrl || PLACEHOLDER})` }}
-                          />
+                          <div className="card__image">
+                            <img
+                              src={p.imageUrl || PLACEHOLDER}
+                              alt={p.name || "Product"}
+                              onError={e => { e.target.src = PLACEHOLDER; e.target.onerror = null; }}
+                            />
+                          </div>
 
                           <div className="card__text">
                             <p className="card__title">{p.name || "Unnamed Product"}</p>
@@ -514,19 +517,23 @@ export default function Home() {
 
                           <div className="card__footer">
                             <div className="card__price">${p.price.toFixed(2)}</div>
-                            <div
-                              className={`card__button ${p.stock <= 0 ? "disabled" : ""}`}
-                              onClick={e => { e.stopPropagation(); if (p.stock > 0) addToCart(p); }}
-                              title={p.stock <= 0 ? "Out of stock" : isInCart ? `Add another (${cartQty} in cart)` : "Add to cart"}
-                            >
-                              <svg height="16" width="16" viewBox="0 0 24 24">
-                                <path
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  d="M4 12H20M12 4V20"
-                                  fill="currentColor"
-                                ></path>
-                              </svg>
+                            <div className="card__actions">
+                              <button
+                                className="card__action card__action--cart"
+                                onClick={e => { e.stopPropagation(); addToCart(p); }}
+                                disabled={p.stock <= 0}
+                                title={p.stock <= 0 ? "Out of stock" : isInCart ? `Add another (${cartQty} in cart)` : "Add to cart"}
+                              >
+                                {isInCart ? `🛒 ${cartQty}` : "🛒 Add"}
+                              </button>
+                              <button
+                                className="card__action card__action--buy"
+                                onClick={e => { e.stopPropagation(); handleBuyNow(p); }}
+                                disabled={p.stock <= 0}
+                                title="Buy now"
+                              >
+                                ⚡ Buy
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -957,13 +964,19 @@ export default function Home() {
           width: 100%;
           height: 130px;
           background-color: #ede9fe;
-          background-size: cover;
-          background-position: center;
           border-radius: 12px;
           transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
           overflow: hidden;
         }
+        .card__image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.4s ease;
+        }
+        .card:hover .card__image img { transform: scale(1.06); }
         .card__text { display: flex; flex-direction: column; gap: 0.25em; }
         .card__title {
           color: var(--card-text);
@@ -987,30 +1000,38 @@ export default function Home() {
         }
         .card__footer {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
+          flex-direction: column;
+          gap: 0.5em;
           margin-top: auto;
         }
         .card__price {
           color: var(--card-text);
           font-weight: 700;
-          font-size: 1em;
+          font-size: 1.05em;
           transition: all 0.3s ease;
         }
-        .card__button {
-          width: 30px;
-          height: 30px;
-          background: var(--card-accent);
-          border-radius: 50%;
+        .card__actions { display: flex; gap: 6px; }
+        .card__action {
+          flex: 1;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 4px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: white;
+          cursor: pointer;
+          transition: all 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          flex-shrink: 0;
+          gap: 3px;
+          min-height: 36px;
         }
-        .card__button.disabled { background: #cbd5e1; cursor: not-allowed; }
+        .card__action--cart { background: linear-gradient(135deg,#10b981,#059669); flex: 1.2; }
+        .card__action--buy  { background: var(--card-accent); }
+        .card__action:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.05); }
+        .card__action:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         /* Hover effects */
         .card:hover {
@@ -1020,16 +1041,13 @@ export default function Home() {
         }
         .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
         .card:hover .card__glow { opacity: 1; }
-        .card:hover .card__image { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card:hover .card__image { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .card:hover .card__title { color: var(--card-accent); }
         .card:hover .card__description { opacity: 1; }
         .card:hover .card__price { color: var(--card-accent); }
-        .card:hover .card__button:not(.disabled) { transform: scale(1.1); box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
-        .card:hover .card__button:not(.disabled) svg { animation: pulse 1.5s infinite; }
         .card:active { transform: translateY(-3px) scale(0.98); }
 
         @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
         .empty-state { grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--card); border-radius:var(--radius); border:2px dashed var(--border); }
         .empty-icon { font-size:3rem; margin-bottom:10px; opacity:0.5; }
         .empty-state h3 { color:var(--text); margin-bottom:6px; }
