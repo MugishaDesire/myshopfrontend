@@ -130,7 +130,7 @@ export default function LoginForm({ onLogin }) {
         <div style={styles.header}>
           <div style={styles.logoContainer}>
             <div style={styles.logoIcon}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="logo-svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="url(#gradient)" />
                 <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12C18 8.69 15.31 6 12 6ZM12 16C9.79 16 8 14.21 8 12C8 9.79 9.79 8 12 8C14.21 8 16 9.79 16 12C16 14.21 14.21 16 12 16Z" fill="url(#gradient)" />
                 <defs>
@@ -141,9 +141,9 @@ export default function LoginForm({ onLogin }) {
                 </defs>
               </svg>
             </div>
-            <h1 style={styles.companyName}>Admin Portal</h1>
+            <h1 style={styles.companyName} className="company-name">Admin Portal</h1>
           </div>
-          <h2 style={styles.title}>Welcome Back</h2>
+          <h2 style={styles.title} className="title-text">Welcome Back</h2>
           <p style={styles.subtitle}>Sign in to your admin dashboard</p>
         </div>
 
@@ -176,6 +176,7 @@ export default function LoginForm({ onLogin }) {
                 disabled={loading}
                 autoComplete="email"
                 style={getInputStyle("email")}
+                className="responsive-input"
               />
               {formData.email && !formErrors.email && <div style={styles.validIcon}>✓</div>}
             </div>
@@ -199,6 +200,7 @@ export default function LoginForm({ onLogin }) {
                 disabled={loading}
                 autoComplete="current-password"
                 style={getInputStyle("password")}
+                className="responsive-input"
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)}
                 style={styles.visibilityToggle} disabled={loading}
@@ -220,7 +222,7 @@ export default function LoginForm({ onLogin }) {
             </div>
           </div>
 
-          <div style={styles.optionsRow}>
+          <div style={styles.optionsRow} className="options-row">
             <label style={styles.checkboxContainer}>
               <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} disabled={loading} />
               <span style={styles.checkboxLabel}>Remember me</span>
@@ -247,12 +249,12 @@ export default function LoginForm({ onLogin }) {
               Use Demo Credentials
             </button>
             <div style={styles.demoHint}>
-              <div style={styles.credentialDisplay}>
-                <div style={styles.credentialItem}>
+              <div style={styles.credentialDisplay} className="credential-display">
+                <div style={styles.credentialItem} className="credential-item">
                   <span style={styles.credentialLabel}>Email:</span>
-                  <code style={styles.credentialValue}>{DEMO_CREDENTIALS.email}</code>
+                  <code style={styles.credentialValue} className="credential-value">{DEMO_CREDENTIALS.email}</code>
                 </div>
-                <div style={styles.credentialItem}>
+                <div style={styles.credentialItem} className="credential-item">
                   <span style={styles.credentialLabel}>Password:</span>
                   <code style={styles.credentialValue}>{DEMO_CREDENTIALS.password}</code>
                 </div>
@@ -260,6 +262,10 @@ export default function LoginForm({ onLogin }) {
               <small style={styles.demoNote}>Click above to auto-fill demo credentials</small>
             </div>
           </div>
+
+          <p className="otp-note" style={styles.otpNote}>
+            After signing in, you'll be asked to enter the one-time code (OTP) sent to your admin email.
+          </p>
         </form>
 
         <div style={styles.footer}>
@@ -290,6 +296,72 @@ export default function LoginForm({ onLogin }) {
         .shake { animation: shake 0.5s ease-in-out; }
         .form-container { animation: fadeIn 0.6s ease-out; }
         .demo-button:hover:not(:disabled) { transform: translateY(-2px) !important; box-shadow: 0 8px 20px rgba(102,126,234,0.2) !important; }
+
+        /* ===== Responsive overrides ===== */
+
+        /* Tablets */
+        @media (max-width: 768px) {
+          .form-container {
+            padding: 32px 28px !important;
+            max-width: 440px !important;
+          }
+        }
+
+        /* Phones */
+        @media (max-width: 480px) {
+          .form-container {
+            padding: 24px 18px !important;
+            border-radius: 16px !important;
+            max-width: 100% !important;
+          }
+          .title-text {
+            font-size: 24px !important;
+          }
+          .company-name {
+            font-size: 18px !important;
+          }
+          .logo-svg {
+            width: 32px !important;
+            height: 32px !important;
+          }
+          .responsive-input {
+            padding: 13px 13px 13px 42px !important;
+            font-size: 14px !important;
+          }
+          .options-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+          /* Credential / OTP-adjacent block: stack label + value instead of
+             squeezing a long email onto one line on narrow screens */
+          .credential-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 2px !important;
+          }
+          .credential-item span {
+            text-align: left !important;
+            min-width: 0 !important;
+          }
+          .credential-value {
+            word-break: break-all !important;
+            white-space: normal !important;
+          }
+          .otp-note {
+            font-size: 12px !important;
+          }
+        }
+
+        /* Very small phones */
+        @media (max-width: 360px) {
+          .form-container {
+            padding: 20px 14px !important;
+          }
+          .title-text {
+            font-size: 21px !important;
+          }
+        }
       `}</style>
     </div>
   );
@@ -301,9 +373,9 @@ const styles = {
   backgroundCircle1: { position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%)", top: "-200px", right: "-200px" },
   backgroundCircle2: { position: "absolute", width: "300px", height: "300px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(102,126,234,0.08) 0%, rgba(118,75,162,0.08) 100%)", bottom: "-150px", left: "-150px" },
   backgroundCircle3: { position: "absolute", width: "200px", height: "200px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%)", top: "50%", right: "10%" },
-  formCard: { backgroundColor: "#ffffff", borderRadius: "24px", boxShadow: "0 20px 60px rgba(0,0,0,0.08)", padding: "48px", width: "100%", maxWidth: "480px", position: "relative", zIndex: 1 },
+  formCard: { backgroundColor: "#ffffff", borderRadius: "24px", boxShadow: "0 20px 60px rgba(0,0,0,0.08)", padding: "48px", width: "100%", maxWidth: "480px", position: "relative", zIndex: 1, boxSizing: "border-box" },
   header: { marginBottom: "40px", textAlign: "center" },
-  logoContainer: { display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginBottom: "20px" },
+  logoContainer: { display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginBottom: "20px", flexWrap: "wrap" },
   logoIcon: { display: "flex", alignItems: "center", justifyContent: "center" },
   companyName: { fontSize: "24px", fontWeight: "700", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 },
   title: { fontSize: "32px", fontWeight: "700", color: "#1a202c", margin: "0 0 8px 0" },
@@ -313,7 +385,7 @@ const styles = {
   errorMessage: { flex: 1, fontSize: "14px", color: "#c53030" },
   form: { marginBottom: "32px" },
   inputGroup: { marginBottom: "24px" },
-  label: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" },
+  label: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "4px" },
   labelText: { fontSize: "14px", fontWeight: "600", color: "#4a5568" },
   errorText: { fontSize: "12px", color: "#e53e3e", fontWeight: "500" },
   inputWrapper: { position: "relative", display: "flex", alignItems: "center" },
@@ -327,18 +399,18 @@ const styles = {
   strengthMeter: { flex: 1, height: "4px", backgroundColor: "#e2e8f0", borderRadius: "2px", overflow: "hidden" },
   strengthBar: { height: "100%", borderRadius: "2px", transition: "width 0.3s ease, background-color 0.3s ease" },
   strengthText: { fontSize: "12px", color: "#718096", minWidth: "40px", textAlign: "right" },
-  optionsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" },
+  optionsRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", flexWrap: "wrap", gap: "12px" },
   checkboxContainer: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", userSelect: "none" },
   checkboxLabel: { fontSize: "14px", color: "#4a5568", fontWeight: "500" },
   forgotPassword: { background: "none", borderWidth: 0, color: "#667eea", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "4px 8px", borderRadius: "4px" },
-  submitButton: { width: "100%", padding: "18px 24px", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "#ffffff", borderWidth: 0, borderRadius: "12px", fontSize: "16px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", fontFamily: "inherit" },
+  submitButton: { width: "100%", padding: "18px 24px", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "#ffffff", borderWidth: 0, borderRadius: "12px", fontSize: "16px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", fontFamily: "inherit", boxSizing: "border-box" },
   submitButtonLoading: { cursor: "not-allowed", opacity: 0.9 },
   spinner: { width: "20px", height: "20px", borderWidth: "2px", borderStyle: "solid", borderColor: "rgba(255,255,255,0.3)", borderTopColor: "#ffffff", borderRadius: "50%", animation: "spin 1s linear infinite" },
   buttonIcon: { fontSize: "18px" },
   demoSection: { marginTop: "32px", textAlign: "center" },
   demoDivider: { position: "relative", marginBottom: "20px" },
   demoDividerText: { display: "inline-block", padding: "0 16px", backgroundColor: "#ffffff", color: "#a0aec0", fontSize: "14px", fontWeight: "500" },
-  demoButton: { width: "100%", padding: "14px 24px", backgroundColor: "#f0f4ff", color: "#667eea", borderWidth: "2px", borderStyle: "solid", borderColor: "#cbd5e0", borderRadius: "12px", fontSize: "15px", fontWeight: "600", cursor: "pointer", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" },
+  demoButton: { width: "100%", padding: "14px 24px", backgroundColor: "#f0f4ff", color: "#667eea", borderWidth: "2px", borderStyle: "solid", borderColor: "#cbd5e0", borderRadius: "12px", fontSize: "15px", fontWeight: "600", cursor: "pointer", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", boxSizing: "border-box" },
   demoButtonIcon: { fontSize: "18px" },
   credentialDisplay: { backgroundColor: "#f8fafc", borderRadius: "8px", padding: "12px", marginBottom: "8px" },
   credentialItem: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", justifyContent: "center" },
@@ -346,11 +418,12 @@ const styles = {
   credentialValue: { fontSize: "13px", backgroundColor: "#e2e8f0", padding: "4px 10px", borderRadius: "6px", fontFamily: "monospace", color: "#2d3748", fontWeight: "500" },
   demoNote: { fontSize: "12px", color: "#a0aec0", fontStyle: "italic" },
   demoHint: { fontSize: "14px", color: "#4a5568", lineHeight: 1.4 },
+  otpNote: { fontSize: "13px", color: "#a0aec0", textAlign: "center", marginTop: "20px", lineHeight: 1.5 },
   footer: { paddingTop: "24px", borderTop: "1px solid #edf2f7" },
   securityInfo: { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "20px", fontSize: "14px", color: "#718096" },
   securityIcon: { fontSize: "16px" },
   securityText: { fontWeight: "500" },
-  backButton: { width: "100%", padding: "12px 24px", backgroundColor: "transparent", color: "#667eea", borderWidth: "1px", borderStyle: "solid", borderColor: "#cbd5e0", borderRadius: "12px", fontSize: "15px", fontWeight: "500", cursor: "pointer", marginBottom: "16px" },
+  backButton: { width: "100%", padding: "12px 24px", backgroundColor: "transparent", color: "#667eea", borderWidth: "1px", borderStyle: "solid", borderColor: "#cbd5e0", borderRadius: "12px", fontSize: "15px", fontWeight: "500", cursor: "pointer", marginBottom: "16px", boxSizing: "border-box" },
   supportLink: { textAlign: "center", fontSize: "14px", color: "#718096" },
   supportLinkAnchor: { color: "#667eea", textDecoration: "none", fontWeight: "500" },
 };

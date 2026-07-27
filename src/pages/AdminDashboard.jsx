@@ -644,7 +644,7 @@ export default function AdminDashboard({ onLogout }) {
                 <span className="admin-name">{adminUser?.name?.split(" ")[0] || "Admin"}</span>
               </div>
             </div>
-            <button className="logout-button" onClick={handleLogout}><span>🚪</span><span>Logout</span></button>
+            <button className="logout-button" onClick={handleLogout}><span className="logout-icon">🚪</span><span className="logout-text">Logout</span></button>
           </div>
           <div className="stats-grid">
             <div className="stat-card"><div className="stat-icon">📦</div><div className="stat-content"><span className="stat-label">Total Products</span><span className="stat-value">{products.length}</span></div></div>
@@ -1099,7 +1099,7 @@ export default function AdminDashboard({ onLogout }) {
       <style>{`
         * { margin:0; padding:0; box-sizing:border-box; }
         html { -webkit-text-size-adjust:100%; }
-        .dashboard-container { max-width:1400px; margin:0 auto; padding:24px; background:#f8fafc; min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+        .dashboard-container { max-width:1400px; margin:0 auto; padding:24px; background:#f8fafc; min-height:100vh; min-height:100dvh; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
         .dashboard-header { background:linear-gradient(135deg,#1e293b,#0f172a); border-radius:20px; padding:24px; margin-bottom:24px; box-shadow:0 10px 30px rgba(0,0,0,.1); }
         .header-content { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; gap:12px; flex-wrap:wrap; }
         .header-left { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
@@ -1181,8 +1181,58 @@ export default function AdminDashboard({ onLogout }) {
         .welcome-badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); padding:8px 16px; border-radius:30px; flex-wrap:wrap; }
         .welcome-text { color:#94a3b8; font-size:14px; }
         .admin-name { color:white; font-weight:600; font-size:14px; word-break:break-word; }
-        .logout-button { display:flex; align-items:center; gap:8px; background:rgba(239,68,68,.2); border:1px solid rgba(239,68,68,.3); color:#ef4444; padding:10px 20px; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer; transition:all .2s; flex-shrink:0; }
-        .logout-button:hover { background:#ef4444; color:white; transform:translateY(-2px); }
+        /* ── Logout button (Uiverse.io by mrhyddenn, adapted) ── */
+        .logout-button {
+          position: relative;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          margin: 0; padding: 10px 20px;
+          outline: none; text-decoration: none;
+          cursor: pointer; border: 1px solid rgba(239,68,68,.35);
+          text-transform: uppercase; letter-spacing: .02em;
+          background-color: rgba(239,68,68,.15);
+          border-radius: 12px;
+          color: #fca5a5;
+          font-weight: 600; font-size: 14px; font-family: inherit;
+          z-index: 0; overflow: hidden; flex-shrink: 0;
+          transition: background-color .3s cubic-bezier(.02,.01,.47,1), color .3s cubic-bezier(.02,.01,.47,1), border-color .3s cubic-bezier(.02,.01,.47,1);
+        }
+        .logout-button:hover { background-color:#ef4444; border-color:#ef4444; color:white; animation: logoutShake .5s ease-in-out both; }
+        @keyframes logoutShake {
+          0%   { transform: rotate(0deg); }
+          25%  { transform: rotate(4deg); }
+          50%  { transform: rotate(-4deg); }
+          75%  { transform: rotate(1deg); }
+          100% { transform: rotate(0deg); }
+        }
+        .logout-button:hover .logout-text { animation: logoutStorm .7s ease-in-out both; animation-delay: .06s; }
+        @keyframes logoutStorm {
+          0%   { transform: translate3d(0,0,0); }
+          25%  { transform: translate3d(3px,0,0); }
+          50%  { transform: translate3d(-3px,0,0); }
+          75%  { transform: translate3d(2px,0,0); }
+          100% { transform: translate3d(0,0,0); }
+        }
+        .logout-button::before,
+        .logout-button::after {
+          content: ''; position: absolute; right: 0; bottom: 0;
+          width: 70px; height: 70px; border-radius: 50%;
+          background: #fff; opacity: 0; z-index: -1;
+          transition: transform .15s cubic-bezier(.02,.01,.47,1), opacity .15s cubic-bezier(.02,.01,.47,1);
+          transform: translate(100%,-25%) translate3d(0,0,0);
+        }
+        .logout-button:hover::before,
+        .logout-button:hover::after {
+          opacity: .18;
+          transition: transform .2s cubic-bezier(.02,.01,.47,1), opacity .2s cubic-bezier(.02,.01,.47,1);
+        }
+        .logout-button:hover::before { transform: translate3d(50%,0,0) scale(.9); }
+        .logout-button:hover::after  { transform: translate(50%,0) scale(1.1); }
+        .logout-icon { position: relative; }
+        .logout-text { position: relative; display: inline-block; }
+        @media (prefers-reduced-motion: reduce) {
+          .logout-button:hover,
+          .logout-button:hover .logout-text { animation: none; }
+        }
         .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
         .stat-card { display:flex; align-items:center; gap:16px; background:rgba(255,255,255,.1); padding:20px; border-radius:16px; transition:transform .2s; min-width:0; }
         .stat-card:hover { transform:translateY(-2px); background:rgba(255,255,255,.15); }
@@ -1332,7 +1382,7 @@ export default function AdminDashboard({ onLogout }) {
         .needs-count { background:#ef4444; color:white; font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px; margin-left:8px; }
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; animation:fadeIn .2s ease; }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-        .modal-box { background:white; border-radius:20px; width:100%; max-width:480px; max-height:90vh; box-shadow:0 25px 60px rgba(0,0,0,.25); animation:slideUp .25s ease; overflow:hidden; display:flex; flex-direction:column; }
+        .modal-box { background:white; border-radius:20px; width:100%; max-width:480px; max-height:90vh; max-height:90dvh; box-shadow:0 25px 60px rgba(0,0,0,.25); animation:slideUp .25s ease; overflow:hidden; display:flex; flex-direction:column; }
         @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
         .modal-header { display:flex; justify-content:space-between; align-items:center; padding:18px 20px; background:linear-gradient(135deg,#1e293b,#0f172a); flex-shrink:0; }
         .modal-title-row { display:flex; align-items:center; gap:10px; }
@@ -1418,12 +1468,25 @@ export default function AdminDashboard({ onLogout }) {
         .orders-count { text-align:center; font-size:13px; opacity:.7; padding-top:12px; border-top:1px solid rgba(255,255,255,.1); }
 
         /* ══════════════════════════════════════════════════════
+            RESPONSIVE — LARGE / IN-BETWEEN DESKTOP
+            (small laptops, split-screen windows — grids with fixed
+            minmax() widths can start overflowing before 900px)
+        ══════════════════════════════════════════════════════ */
+        @media (max-width:1200px) {
+          .product-grid   { grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }
+          .couriers-grid  { grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }
+          .dashboard-container { padding:20px; }
+        }
+
+        /* ══════════════════════════════════════════════════════
             RESPONSIVE — TABLET
         ══════════════════════════════════════════════════════ */
         @media (max-width:900px) {
           .stats-grid { grid-template-columns:1fr 1fr; gap:14px; }
           .product-grid { grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); }
           .couriers-grid { grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); }
+          .cashout-form { grid-template-columns:1fr; gap:16px; }
+          .cashout-send-btn,.cashout-retry-btn,.cashout-error,.cashout-pending { grid-column:1; }
         }
 
         /* ══════════════════════════════════════════════════════
@@ -1438,7 +1501,8 @@ export default function AdminDashboard({ onLogout }) {
           .title-icon { font-size:24px; }
           .welcome-badge { padding:6px 12px; }
           .welcome-text, .admin-name { font-size:12px; }
-          .logout-button { width:100%; justify-content:center; padding:12px; }
+          .logout-button { width:100%; justify-content:center; padding:12px; font-size:13px; }
+          .logout-button::before, .logout-button::after { width:56px; height:56px; }
           .stats-grid { grid-template-columns:1fr 1fr; gap:10px; }
           .stat-card { padding:14px; gap:10px; border-radius:12px; }
           .stat-icon { font-size:24px; }
@@ -1502,11 +1566,11 @@ export default function AdminDashboard({ onLogout }) {
           .edit-grid { grid-template-columns:1fr; }
 
           .modal-overlay { padding:0; align-items:flex-end; }
-          .modal-box { max-width:100%; max-height:92vh; border-radius:20px 20px 0 0; animation:slideUpMobile .25s ease; }
+          .modal-box { max-width:100%; max-height:92vh; max-height:92dvh; border-radius:20px 20px 0 0; animation:slideUpMobile .25s ease; }
           @keyframes slideUpMobile { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
           .modal-header { padding:16px 16px; }
           .modal-body { padding:16px; }
-          .details-modal-body { padding:16px; max-height:60vh; }
+          .details-modal-body { padding:16px; max-height:60vh; max-height:60dvh; }
           .details-customer-card { padding:12px; }
           .details-meta-row { gap:8px; }
           .details-meta-item { min-width:100px; padding:8px 10px; }
@@ -1543,6 +1607,51 @@ export default function AdminDashboard({ onLogout }) {
           .dashboard-title { font-size:18px; }
           .details-items-header, .details-item-row { grid-template-columns:1fr 28px 50px 50px; }
           .co-stats { align-items:flex-start; flex-direction:row; flex-wrap:wrap; }
+        }
+
+        /* ══════════════════════════════════════════════════════
+            RESPONSIVE — VERY SMALL / NARROW FOLDABLES
+            (Galaxy Fold cover screen, smallest Android devices)
+        ══════════════════════════════════════════════════════ */
+        @media (max-width:340px) {
+          .dashboard-container { padding:8px; }
+          .dashboard-header { padding:12px; border-radius:14px; }
+          .dashboard-title { font-size:16px; gap:8px; }
+          .title-icon { font-size:20px; }
+          .logout-button { padding:10px; font-size:12px; gap:6px; }
+          .logout-button::before, .logout-button::after { width:44px; height:44px; }
+          .stats-grid { grid-template-columns:1fr; gap:8px; }
+          .stat-card { flex-direction:row; align-items:center; padding:12px; }
+          .tab-navigation { flex-wrap:wrap; }
+          .tab-button { flex:1 1 30%; padding:8px 4px; font-size:10px; }
+          .form-section,.list-section { padding:12px; }
+          .file-name { max-width:100px; }
+          .details-items-header, .details-item-row { grid-template-columns:1fr 22px 44px 44px; gap:2px; padding:8px 6px; }
+          .details-item-qty, .details-item-price { display:none; }
+          .co-avatar, .cc-avatar, .order-avatar { width:32px; height:32px; font-size:13px; }
+        }
+
+        /* ══════════════════════════════════════════════════════
+            RESPONSIVE — SHORT / LANDSCAPE VIEWPORTS
+            Keeps modals and sticky tabs usable when a phone or
+            tablet is rotated sideways.
+        ══════════════════════════════════════════════════════ */
+        @media (max-height:480px) {
+          .tab-navigation { position:static; }
+          .modal-overlay { align-items:center; padding:8px; }
+          .modal-box, .details-modal-box { max-height:96vh; max-height:96dvh; }
+          .modal-body, .details-modal-body { max-height:70vh; max-height:70dvh; padding:12px 16px; }
+          .courier-options { max-height:140px; }
+          .cashout-section, .revenue-summary { padding:16px; }
+        }
+
+        /* ══════════════════════════════════════════════════════
+            RESPONSIVE — LARGE / HIGH-DPI DESKTOP
+            Give the layout a little more breathing room instead
+            of stretching content edge-to-edge on very wide screens.
+        ══════════════════════════════════════════════════════ */
+        @media (min-width:1800px) {
+          .dashboard-container { max-width:1600px; padding:32px; }
         }
       `}</style>
     </>
