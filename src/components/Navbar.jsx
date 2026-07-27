@@ -123,12 +123,13 @@ export default function Navbar() {
                 className="all-categories-btn"
                 onClick={() => setOpenCategory(openCategory === "all" ? null : "all")}
                 aria-expanded={openCategory === "all"}
+                aria-label="All Categories"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                   <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
-                All Categories
+                <span className="btn-text">All Categories</span>
                 <svg className={`chevron ${openCategory === "all" ? "up" : ""}`} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
@@ -361,6 +362,7 @@ export default function Navbar() {
           position: sticky; top: 0; z-index: 1000;
           font-family: 'DM Sans', sans-serif;
           box-shadow: var(--shadow);
+          width: 100%;
         }
 
         /* ── Promo bar ── */
@@ -386,6 +388,7 @@ export default function Navbar() {
           max-width: 1400px; margin: 0 auto;
           padding: 0 20px; height: 64px;
           display: flex; align-items: center; gap: 16px;
+          width: 100%;
         }
 
         /* ── Hamburger (top bar) — visible at every screen size ── */
@@ -428,6 +431,7 @@ export default function Navbar() {
           background: linear-gradient(135deg,#fff 30%,var(--accent2));
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           letter-spacing: -0.5px;
+          white-space: nowrap;
         }
 
         /* ── Categories ── */
@@ -447,7 +451,7 @@ export default function Navbar() {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(249,115,22,0.4);
         }
-        .chevron { transition: transform 0.25s; }
+        .chevron { transition: transform 0.25s; flex-shrink: 0; }
         .chevron.up { transform: rotate(180deg); }
         .mega-dropdown {
           position: absolute; top: calc(100% + 8px); left: 0;
@@ -470,11 +474,11 @@ export default function Navbar() {
 
         /* ── Search ── */
         .search-form {
-          flex: 1; min-width: 0;
+          flex: 1 1 auto; min-width: 0; max-width: 520px;
           background: rgba(255,255,255,0.08);
           border: 1.5px solid rgba(255,255,255,0.15);
           border-radius: var(--radius); overflow: hidden;
-          transition: border-color 0.2s, box-shadow 0.2s;
+          transition: border-color 0.2s, box-shadow 0.2s, max-width 0.2s;
         }
         .search-form:focus-within {
           border-color: var(--accent);
@@ -482,7 +486,7 @@ export default function Navbar() {
           background: rgba(255,255,255,0.12);
         }
         .search-input {
-          flex: 1; border: none; outline: none;
+          width: 100%; border: none; outline: none;
           background: transparent; color: white;
           font-family: 'DM Sans', sans-serif;
           font-size: 0.92rem; padding: 0 15px; min-width: 0;
@@ -515,7 +519,7 @@ export default function Navbar() {
           animation: dropIn 0.2s ease;
         }
         .mobile-search-input {
-          flex: 1; border: none; outline: none;
+          flex: 1; min-width: 0; border: none; outline: none;
           background: rgba(255,255,255,0.1);
           color: white; font-family: 'DM Sans', sans-serif;
           font-size: 0.95rem; padding: 10px 14px;
@@ -532,6 +536,7 @@ export default function Navbar() {
         /* ── Right actions ── */
         .top-actions {
           display: flex; align-items: center; gap: 2px; flex-shrink: 0;
+          margin-left: auto;
         }
         .action-icon-btn {
           display: flex; flex-direction: column; align-items: center;
@@ -550,7 +555,7 @@ export default function Navbar() {
         }
         .badge.red    { background: var(--red); }
         .badge.yellow { background: var(--accent); }
-        .action-label { font-size: 0.68rem; font-weight: 500; }
+        .action-label { font-size: 0.68rem; font-weight: 500; white-space: nowrap; }
 
         /* ── Account button ── */
         .account-btn {
@@ -573,13 +578,13 @@ export default function Navbar() {
           justify-content: center; font-family: 'Syne', sans-serif;
           font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
         }
-        .account-info { display: flex; flex-direction: column; gap: 1px; }
+        .account-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
         .account-name {
           font-size: 0.86rem; font-weight: 600; color: white;
           max-width: 120px; white-space: nowrap;
           overflow: hidden; text-overflow: ellipsis;
         }
-        .account-status { font-size: 0.67rem; color: rgba(255,255,255,0.7); }
+        .account-status { font-size: 0.67rem; color: rgba(255,255,255,0.7); white-space: nowrap; }
 
         /* ── Bottom bar (desktop only) ── */
         .bottom-bar { background: var(--brand2); border-top: 1px solid rgba(255,255,255,0.06); }
@@ -587,8 +592,9 @@ export default function Navbar() {
           max-width: 1400px; margin: 0 auto;
           padding: 0 20px; height: 44px;
           display: flex; align-items: center; width: 100%;
+          flex-wrap: wrap;
         }
-        .bottom-nav-links { display: flex; align-items: center; gap: 2px; flex: 1; }
+        .bottom-nav-links { display: flex; align-items: center; gap: 2px; flex: 1; flex-wrap: wrap; }
         .bnav-link {
           color: rgba(255,255,255,0.75); text-decoration: none;
           font-size: 0.9rem; font-weight: 500;
@@ -620,7 +626,7 @@ export default function Navbar() {
         /* ── Drawer ── */
         .mobile-drawer {
           position: fixed; top: 0; left: -100%;
-          width: min(320px, 100vw); height: 100vh;
+          width: min(320px, 100vw); height: 100vh; height: 100dvh;
           background: white; z-index: 2000;
           transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
           display: flex; flex-direction: column;
@@ -641,9 +647,10 @@ export default function Navbar() {
           width: 32px; height: 32px; border-radius: 50%; font-size: 15px;
           cursor: pointer; transition: all 0.2s;
           display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
         }
         .drawer-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
-        .drawer-body { flex: 1; overflow-y: auto; padding: 14px; }
+        .drawer-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; }
         .drawer-user-card {
           display: flex; align-items: center; gap: 12px;
           background: linear-gradient(135deg,#065f46,#10b981);
@@ -653,9 +660,9 @@ export default function Navbar() {
           width: 42px; height: 42px; background: white; color: #065f46;
           border-radius: 50%; display: flex; align-items: center;
           justify-content: center; font-family: 'Syne', sans-serif;
-          font-weight: 800; font-size: 0.88rem;
+          font-weight: 800; font-size: 0.88rem; flex-shrink: 0;
         }
-        .drawer-username { color: white; font-weight: 700; font-size: 0.93rem; }
+        .drawer-username { color: white; font-weight: 700; font-size: 0.93rem; word-break: break-word; }
         .drawer-userstatus { color: rgba(255,255,255,0.8); font-size: 0.73rem; }
         .drawer-section-title {
           font-family: 'Syne', sans-serif; font-size: 0.7rem;
@@ -680,28 +687,87 @@ export default function Navbar() {
 
         /* ════════════════════════════════════════
            RESPONSIVE BREAKPOINTS
+           Ordered widest → narrowest so later, more
+           specific rules win on cascade for shared props.
         ════════════════════════════════════════ */
 
-        /* Tablet — hide account text */
+        /* Large desktop — plenty of room, nothing to change */
+
+        /* Laptop / narrower desktop — search bar has less room to breathe */
+        @media (max-width: 1200px) {
+          .search-form { max-width: 360px; }
+          .top-bar-inner { gap: 12px; }
+        }
+
+        /* Small laptop / large tablet landscape — trim account text width */
+        @media (max-width: 1100px) {
+          .search-form { max-width: 260px; }
+          .account-name { max-width: 90px; }
+        }
+
+        /* Tablet — hide account text, icon-only account button */
         @media (max-width: 1024px) {
           .account-info { display: none !important; }
           .account-btn  { padding: 7px; }
+          .search-form  { max-width: 220px; }
         }
 
-        /* Large mobile / small tablet */
+        /* Tablet portrait — categories collapse to icon-only, search shrinks further */
+        @media (max-width: 900px) {
+          .btn-text { display: none; }
+          .all-categories-btn { padding: 9px 11px; }
+          .search-form { max-width: 170px; }
+          .top-bar-inner { gap: 8px; padding: 0 16px; }
+          .promo-tag { display: none; }
+        }
+
+        /* Large mobile / small tablet — switch to compact mobile layout */
         @media (max-width: 768px) {
           .desktop-only { display: none !important; }
           .mobile-only  { display: flex !important; }
           .action-label { display: none; }
           .top-bar-inner { height: 56px; padding: 0 14px; gap: 10px; }
           .logo-text { font-size: 1.45rem; }
+          .top-actions { gap: 0; }
+          .action-icon-btn { padding: 6px 8px; }
+        }
+
+        /* Standard phones */
+        @media (max-width: 480px) {
+          .discover-text { font-size: 0.68rem; letter-spacing: 0.04em; }
+          .top-bar-inner { padding: 0 12px; gap: 6px; }
+          .hamburger-top { width: 36px; height: 36px; }
+          .account-btn { padding: 6px; }
+          .avatar { width: 28px; height: 28px; font-size: 0.72rem; }
+          .mobile-search-icon { width: 36px; height: 36px; }
         }
 
         /* Small phones */
         @media (max-width: 380px) {
           .logo-text { font-size: 1.25rem; }
           .logo-icon { font-size: 20px; }
-          .top-bar-inner { padding: 0 10px; gap: 8px; }
+          .top-bar-inner { padding: 0 10px; gap: 6px; }
+          .action-icon-btn { padding: 6px 6px; }
+          .discover-bar { padding: 4px 10px; }
+        }
+
+        /* Very small / narrow foldables */
+        @media (max-width: 340px) {
+          .logo-icon { display: none; }
+          .logo-text { font-size: 1.1rem; }
+          .discover-text { font-size: 0.6rem; }
+          .top-bar-inner { gap: 4px; padding: 0 8px; }
+          .hamburger-top { width: 32px; height: 32px; padding: 6px; }
+          .mobile-search-icon { width: 32px; height: 32px; }
+          .avatar { width: 26px; height: 26px; font-size: 0.66rem; }
+        }
+
+        /* Short viewports (landscape phones) — keep the drawer usable */
+        @media (max-height: 480px) {
+          .drawer-header { height: 46px; }
+          .drawer-body { padding: 10px; }
+          .drawer-nav-link { padding: 8px 12px; }
+          .drawer-user-card { padding: 10px; margin-bottom: 10px; }
         }
       `}</style>
     </>

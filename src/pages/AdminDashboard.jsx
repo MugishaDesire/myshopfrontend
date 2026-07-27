@@ -641,7 +641,7 @@ export default function AdminDashboard({ onLogout }) {
               <h1 className="dashboard-title"><span className="title-icon">📊</span>Admin Dashboard</h1>
               <div className="welcome-badge">
                 <span className="welcome-text">Welcome back,</span>
-                <span className="admin-name">{ adminUser?.name || "Admin"}</span>
+                <span className="admin-name">{adminUser?.name?.split(" ")[0] || "Admin"}</span>
               </div>
             </div>
             <button className="logout-button" onClick={handleLogout}><span>🚪</span><span>Logout</span></button>
