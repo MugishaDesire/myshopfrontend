@@ -43,6 +43,9 @@ export default function AdminDashboard({ onLogout }) {
   // ── View Details modal state ───────────────────────────────
   const [detailsModal, setDetailsModal] = useState(null);
 
+  // ── Admin profile (fetched fresh from DB) ───────────────────
+  const [adminProfile, setAdminProfile] = useState(null);
+
   // ── Socket: live order status updates from courier ──────────
   const socketRef = useRef(null);
 
@@ -200,6 +203,20 @@ export default function AdminDashboard({ onLogout }) {
     }
   };
 
+  // ── Fetch admin profile fresh from the DB ───────────────────
+  // adminUser (below) only reflects whatever was cached in
+  // localStorage at login time. This pulls the current row from
+  // the `admins` table so the name shown always matches the DB.
+  const fetchAdminProfile = async () => {
+    if (!adminUser?.id) return;
+    try {
+      const res = await api.get(`/auth/admin/profile/${adminUser.id}`);
+      setAdminProfile(res.data.admin);
+    } catch (err) {
+      console.error("Failed to load admin profile", err);
+    }
+  };
+
   // ── Fetch products + orders + couriers on mount ────────────
   useEffect(() => {
     const fetchData = async () => {
@@ -220,7 +237,8 @@ export default function AdminDashboard({ onLogout }) {
     };
     fetchData();
     fetchCouriers();
-  }, []);
+    fetchAdminProfile();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Product CRUD (unchanged) ────────────────────────────────
   const addProduct = async () => {
@@ -641,7 +659,9 @@ export default function AdminDashboard({ onLogout }) {
               <h1 className="dashboard-title"><span className="title-icon">📊</span>Admin Dashboard</h1>
               <div className="welcome-badge">
                 <span className="welcome-text">Welcome back,</span>
-                <span className="admin-name">{adminUser?.name?.split(" ")[0] || "Admin"}</span>
+                <span className="admin-name">
+                  {adminProfile?.name?.split(" ")[0] || adminUser?.name?.split(" ")[0] || "Admin"}
+                </span>
               </div>
             </div>
             <button className="logout-button" onClick={handleLogout}><span className="logout-icon">🚪</span><span className="logout-text">Logout</span></button>
