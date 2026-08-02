@@ -210,7 +210,7 @@ export default function AdminDashboard({ onLogout }) {
   const fetchAdminProfile = async () => {
     if (!adminUser?.id) return;
     try {
-      const res = await api.get(`/auth/admin/profile/${adminUser.id}`);
+      const res = await api.get(`/admin/profile/${adminUser.id}`);
       setAdminProfile(res.data.admin);
     } catch (err) {
       console.error("Failed to load admin profile", err);
