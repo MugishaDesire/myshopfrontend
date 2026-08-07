@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getWishlist, toggleWishlist } from "./Wishlist";
 import api from "../api/axios.jsx";
+import ProductCard from "./ProductCard.jsx";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CATEGORIES   = ["All", "Electronics", "Fashion", "Food", "Art", "Beauty"];
@@ -254,7 +255,7 @@ export default function Home() {
         : [...prev, p];
     });
     setLastAdded(product);
-    setCartOpen(true);
+    setCartOpen(true); // opens the cart drawer, which lists every item currently in the cart
   };
 
   const clearCart = () => {
@@ -464,80 +465,19 @@ export default function Home() {
                   </div>
                 ) : (
                   filteredProducts.map(p => {
-                    const cartItem   = cart.find(i => i.id === p.id);
-                    const isInCart   = !!cartItem;
-                    const cartQty    = cartItem?.quantity || 0;
-                    const wishlisted = wishlist.some(w => w.id === p.id);
-                    // Uiverse "SachinKumar666" card, badge shows the most
-                    // relevant status (out of stock beats low stock beats in-cart)
-                    const badgeLabel = p.stock <= 0
-                      ? "Out of Stock"
-                      : p.stock < 10
-                      ? "Low Stock"
-                      : isInCart
-                      ? `In Cart · ${cartQty}`
-                      : null;
-                    const badgeClass = p.stock <= 0 ? "oos" : p.stock < 10 ? "low" : "cart";
-
+                    const cartItem = cart.find(i => i.id === p.id);
                     return (
-                      <div key={p.id} className="card" onClick={() => openProductModal(p)}>
-                        <div className="card__shine"></div>
-                        <div className="card__glow"></div>
-
-                        <button
-                          className={`card__heart ${wishlisted ? "hearted" : ""}`}
-                          onClick={e => { e.stopPropagation(); handleWishlistToggle(p); }}
-                        >
-                          {wishlisted ? "❤️" : "🤍"}
-                        </button>
-
-                        <div className="card__content">
-                          {badgeLabel && (
-                            <div className={`card__badge ${badgeClass}`}>{badgeLabel}</div>
-                          )}
-
-                          <div className="card__image">
-                            <img
-                              src={p.imageUrl || PLACEHOLDER}
-                              alt={p.name || "Product"}
-                              onError={e => { e.target.src = PLACEHOLDER; e.target.onerror = null; }}
-                            />
-                          </div>
-
-                          <div className="card__text">
-                            <p className="card__title">{p.name || "Unnamed Product"}</p>
-                            <p className="card__description">
-                              {p.description
-                                ? (p.description.length > 60
-                                    ? `${p.description.substring(0, 60)}…`
-                                    : p.description)
-                                : `${p.category || "General"} · ${p.stock <= 0 ? "Out of stock" : `${p.stock} in stock`}`}
-                            </p>
-                          </div>
-
-                          <div className="card__footer">
-                            <div className="card__price">${p.price.toFixed(2)}</div>
-                            <div className="card__actions">
-                              <button
-                                className="card__action card__action--cart"
-                                onClick={e => { e.stopPropagation(); addToCart(p); }}
-                                disabled={p.stock <= 0}
-                                title={p.stock <= 0 ? "Out of stock" : isInCart ? `Add another (${cartQty} in cart)` : "Add to cart"}
-                              >
-                                {isInCart ? `🛒 ${cartQty}` : "🛒 Add"}
-                              </button>
-                              <button
-                                className="card__action card__action--buy"
-                                onClick={e => { e.stopPropagation(); handleBuyNow(p); }}
-                                disabled={p.stock <= 0}
-                                title="Buy now"
-                              >
-                                ⚡ Buy
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <ProductCard
+                        key={p.id}
+                        product={p}
+                        isInCart={!!cartItem}
+                        cartQty={cartItem?.quantity || 0}
+                        wishlisted={wishlist.some(w => w.id === p.id)}
+                        onAddToCart={addToCart}
+                        onBuyNow={handleBuyNow}
+                        onWishlistToggle={handleWishlistToggle}
+                        onOpenModal={openProductModal}
+                      />
                     );
                   })
                 )}
@@ -822,15 +762,6 @@ export default function Home() {
         .sidebar .filter-panel { background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid var(--border); position:sticky; top:130px; }
 
         /* ── MOBILE FILTER DRAWER ── */
-        /* FIX: this overlay is a mobile-only dimmer for the bottom-sheet drawer.
-           It previously had no breakpoint guard, so on desktop it rendered as
-           a full-viewport fixed layer (z-index:1998) sitting ABOVE the desktop
-           sidebar (which has no z-index of its own). Every click meant for a
-           category/price/sort control in the sidebar actually landed on this
-           overlay instead, whose only handler closes the panel — that's why
-           filtering appeared to work only on mobile. display:block is now
-           gated inside the same max-width:900px block as the drawer, so on
-           desktop this element is never visible or clickable. */
         .filter-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1998; }
         .filter-drawer { display:none; position:fixed; bottom:0; left:0; right:0; background:white; z-index:1999; border-radius:20px 20px 0 0; max-height:88vh; flex-direction:column; box-shadow:0 -8px 32px rgba(0,0,0,0.15); transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); }
         .filter-drawer.open { transform:translateY(0); }
@@ -859,9 +790,6 @@ export default function Home() {
         .range-slider { position:absolute; width:100%; left:0; -webkit-appearance:none; -moz-appearance:none; appearance:none; height:4px; background:transparent; outline:none; pointer-events:none; top:14px; }
         .range-slider::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--accent); border:3px solid white; box-shadow:0 2px 6px rgba(249,115,22,0.4); cursor:pointer; pointer-events:all; }
         .range-slider::-webkit-slider-runnable-track { height:4px; background:var(--border); border-radius:4px; }
-        /* FIX: Firefox ignores the WebKit-only thumb selector above, so the
-           slider's pointer-events:none on the input was never re-enabled and
-           the price slider couldn't be dragged at all in Firefox. */
         .range-slider::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:var(--accent); border:3px solid white; box-shadow:0 2px 6px rgba(249,115,22,0.4); cursor:pointer; pointer-events:all; }
         .range-slider::-moz-range-track { height:4px; background:var(--border); border-radius:4px; }
         .price-ticks { display:flex; justify-content:space-between; font-size:0.65rem; color:var(--muted); margin-top:2px; }
@@ -879,175 +807,9 @@ export default function Home() {
         .spinner { width:40px; height:40px; border:4px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.9s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* ── PRODUCT GRID (Uiverse "SachinKumar666" card) ── */
+        /* ── PRODUCT GRID ── (card styling itself now lives in ProductCard.jsx) */
         .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:18px; margin-bottom:24px; }
 
-        .card {
-          --card-bg: #ffffff;
-          --card-accent: #f97316;
-          --card-text: #1e293b;
-          --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-          width: 100%;
-          background: var(--card-bg);
-          border-radius: 20px;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: var(--card-shadow);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          font-family: 'DM Sans', sans-serif;
-          cursor: pointer;
-          display: flex;
-          flex-direction: column;
-        }
-        .card__shine {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          pointer-events: none;
-        }
-        .card__glow {
-          position: absolute;
-          inset: -10px;
-          background: radial-gradient(circle at 50% 0%, rgba(249,115,22,0.25) 0%, rgba(249,115,22,0) 70%);
-          opacity: 0;
-          transition: opacity 0.5s ease;
-          pointer-events: none;
-        }
-        .card__heart {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          z-index: 6;
-          background: rgba(255,255,255,0.92);
-          border: none;
-          border-radius: 50%;
-          width: 30px;
-          height: 30px;
-          font-size: 0.9rem;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-          transition: transform 0.2s ease;
-        }
-        .card__heart:hover { transform: scale(1.15); }
-        .card__content {
-          padding: 1.1em;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 0.7em;
-          position: relative;
-          z-index: 2;
-        }
-        .card__badge {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          color: white;
-          padding: 0.25em 0.6em;
-          border-radius: 999px;
-          font-size: 0.65em;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-          z-index: 3;
-        }
-        .card__badge.oos  { background: var(--red); }
-        .card__badge.low  { background: var(--gold); }
-        .card__badge.cart { background: var(--blue); }
-        .card__image {
-          width: 100%;
-          height: 130px;
-          background-color: #ede9fe;
-          border-radius: 12px;
-          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-          position: relative;
-          overflow: hidden;
-        }
-        .card__image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: transform 0.4s ease;
-        }
-        .card:hover .card__image img { transform: scale(1.06); }
-        .card__text { display: flex; flex-direction: column; gap: 0.25em; }
-        .card__title {
-          color: var(--card-text);
-          font-size: 1em;
-          font-weight: 700;
-          transition: all 0.3s ease;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .card__description {
-          color: var(--card-text);
-          font-size: 0.75em;
-          opacity: 0.7;
-          transition: all 0.3s ease;
-          line-height: 1.4;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .card__footer {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5em;
-          margin-top: auto;
-        }
-        .card__price {
-          color: var(--card-text);
-          font-weight: 700;
-          font-size: 1.05em;
-          transition: all 0.3s ease;
-        }
-        .card__actions { display: flex; gap: 6px; }
-        .card__action {
-          flex: 1;
-          border: none;
-          border-radius: 8px;
-          padding: 8px 4px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.78rem;
-          font-weight: 700;
-          color: white;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 3px;
-          min-height: 36px;
-        }
-        .card__action--cart { background: linear-gradient(135deg,#10b981,#059669); flex: 1.2; }
-        .card__action--buy  { background: var(--card-accent); }
-        .card__action:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.05); }
-        .card__action:disabled { background: #cbd5e1; cursor: not-allowed; }
-
-        /* Hover effects */
-        .card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-          border-color: rgba(249,115,22,0.2);
-        }
-        .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
-        .card:hover .card__glow { opacity: 1; }
-        .card:hover .card__image { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .card:hover .card__title { color: var(--card-accent); }
-        .card:hover .card__description { opacity: 1; }
-        .card:hover .card__price { color: var(--card-accent); }
-        .card:active { transform: translateY(-3px) scale(0.98); }
-
-        @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
         .empty-state { grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--card); border-radius:var(--radius); border:2px dashed var(--border); }
         .empty-icon { font-size:3rem; margin-bottom:10px; opacity:0.5; }
         .empty-state h3 { color:var(--text); margin-bottom:6px; }
@@ -1172,7 +934,6 @@ export default function Home() {
         @media (max-width:420px) {
           .product-grid { grid-template-columns:1fr; }
           .body-wrap { padding:10px; }
-          .card__image { height:160px; }
         }
       `}</style>
     </>
