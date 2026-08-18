@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+const PLACEHOLDER = "https://placehold.co/300x200/3b82f6/white?text=No+Image";
+
 export default function Cart() {
   const [cart, setCart] = useState(() => {
     try {
@@ -13,14 +15,15 @@ export default function Cart() {
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    try {
-      const u = localStorage.getItem("user");
-      if (u && u !== "undefined" && u !== "null") setUser(JSON.parse(u));
-    } catch {}
-    setLoaded(true);
-  }, []);
-
+ useEffect(() => {
+  try {
+    const u = localStorage.getItem("user");
+    if (u && u !== "undefined" && u !== "null") setUser(JSON.parse(u));
+  } catch (err) {
+    console.warn("Failed to parse stored user:", err);
+  }
+  setLoaded(true);
+}, []);
   // Only save back to localStorage AFTER initial load — prevents overwriting on mount
   useEffect(() => {
     if (!loaded) return;
@@ -185,10 +188,12 @@ export default function Cart() {
                     const lineTotal = (price * item.quantity).toFixed(2);
                     return (
                       <div className="cart-item" key={item.id}>
-                        {item.image_url
-                          ? <img className="ci-img" src={item.image_url} alt={item.name} onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }} />
-                          : null}
-                        <div className="ci-img-placeholder" style={item.image_url ? { display: "none" } : {}}>🛍️</div>
+                        <img
+                          className="ci-img"
+                          src={item.imageUrl || item.image_url || PLACEHOLDER}
+                          alt={item.name}
+                          onError={e => { e.target.src = PLACEHOLDER; e.target.onerror = null; }}
+                        />
                         <div className="ci-info">
                           <div className="ci-name">{item.name}</div>
                           {item.category && <span className="ci-cat">{item.category}</span>}

@@ -198,7 +198,7 @@ export default function Home() {
 
   // ── Load cart from localStorage ────────────────────────
   useEffect(() => {
-    try { setCart(JSON.parse(localStorage.getItem("shoppingCart") || "[]")); } catch {}
+    try { setCart(JSON.parse(localStorage.getItem("shoppingCart") || "[]")); } catch {console.warn("Failed to parse stored cart");}
   }, []);
 
   // ── Sync cart to localStorage ──────────────────────────
@@ -628,7 +628,12 @@ export default function Home() {
 
         {lastAdded && (
           <div className="cd-added-banner">
-            <span className="cd-added-img">🛍️</span>
+            <img
+              className="cd-added-img"
+              src={lastAdded.imageUrl || PLACEHOLDER}
+              alt={lastAdded.name}
+              onError={e => { e.target.src = PLACEHOLDER; e.target.onerror = null; }}
+            />
             <span>✅ <strong>{lastAdded.name}</strong> added!</span>
           </div>
         )}
@@ -645,7 +650,12 @@ export default function Home() {
               const price = parseFloat(item.price) || 0;
               return (
                 <div className="cd-item" key={item.id}>
-                  <div className="cd-item-ph">🛍️</div>
+                  <img
+                    className="cd-item-img"
+                    src={item.imageUrl || PLACEHOLDER}
+                    alt={item.name}
+                    onError={e => { e.target.src = PLACEHOLDER; e.target.onerror = null; }}
+                  />
                   <div className="cd-item-info">
                     <div className="cd-item-name">{item.name}</div>
                     <div className="cd-item-price">${(price * item.quantity).toFixed(2)}</div>
@@ -875,10 +885,10 @@ export default function Home() {
         .cd-head-badge { background:var(--accent); color:white; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:20px; }
         .cd-close { background:rgba(255,255,255,0.12); border:none; color:white; width:32px; height:32px; border-radius:8px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
         .cd-added-banner { background:#f0fdf4; border-bottom:1px solid #bbf7d0; padding:10px 16px; display:flex; align-items:center; gap:8px; font-size:0.85rem; color:#166534; font-weight:600; flex-shrink:0; }
-        .cd-added-img { font-size:1.3rem; }
+        .cd-added-img { width:32px; height:32px; border-radius:6px; object-fit:cover; flex-shrink:0; }
         .cd-items { flex:1; overflow-y:auto; padding:8px 0; }
         .cd-item { display:grid; grid-template-columns:52px 1fr auto; gap:10px; padding:10px 16px; border-bottom:1px solid #f1f5f9; align-items:center; }
-        .cd-item-ph { width:52px; height:52px; border-radius:8px; background:linear-gradient(135deg,#e2e8f0,#f1f5f9); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+        .cd-item-img { width:52px; height:52px; border-radius:8px; object-fit:cover; background:#f1f5f9; flex-shrink:0; }
         .cd-item-info { min-width:0; }
         .cd-item-name { font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
         .cd-item-price { color:var(--accent); font-weight:700; font-size:0.88rem; }
