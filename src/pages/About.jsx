@@ -110,7 +110,7 @@ export default function About() {
             <div className="team-grid">
               <div className="team-member">
                 <div className="member-avatar">👨‍💼</div>
-                <h3>Yves IRAGUHA</h3>
+                <h3>Desire MUGISHA</h3>
                 <p className="member-role">CEO & Founder</p>
                 <p className="member-bio">
                   With 5+ years in e-commerce, Yves founded MyShop with a vision 
@@ -128,7 +128,7 @@ export default function About() {
               </div>
               <div className="team-member">
                 <div className="member-avatar">👨‍💼</div>
-                <h3>Mugisha</h3>
+                <h3>Iraguha</h3>
                 <p className="member-role">Operations Director</p>
                 <p className="member-bio">
                   Ensures smooth logistics and timely delivery of every order 
